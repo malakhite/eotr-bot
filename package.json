@@ -26,19 +26,9 @@
     "pino": "^6.6.1",
     "typed-rest-client": "^1.7.3"
   },
-  "release": {
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github"
-    ]
-  },
   "scripts": {
     "run": "node dist/main.js",
-    "build": "tsc --noEmit",
+    "build": "tsc",
     "lint": "eslint --fix",
     "clean": "rimraf dist",
     "release": "semantic-release"
