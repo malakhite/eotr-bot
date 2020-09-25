@@ -89,7 +89,6 @@ export async function handleMusic(urls: URL[]) {
   const response = await songwhipClient.create<MusicSources>('api', payload);
 
   const links = response.result?.data.links;
-  const image = response.result?.data.image;
   const message = new MessageEmbed()
     .setTitle('More sources')
     .addFields(
@@ -98,7 +97,6 @@ export async function handleMusic(urls: URL[]) {
       { name: 'Apple Music', value: links?.itunes[0].link.replace('{country}', 'US') },
       { name: 'Tidal', value: links?.tidal[0].link },
     )
-    .setImage(image!)
     .setTimestamp();
 
   return message;
