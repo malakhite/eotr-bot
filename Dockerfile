@@ -2,7 +2,7 @@ FROM node:lts-alpine AS builder
 WORKDIR /var/app/
 COPY [ "package.json", "yarn.lock", "./" ]
 RUN [ "yarn", "install", "--frozen-lockfile" ]
-COPY [ "src", "./src/" ]
+COPY [ "./", "./" ]
 RUN [ "yarn", "build" ]
 RUN [ "yarn", "release" ]
 
