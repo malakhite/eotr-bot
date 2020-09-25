@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import Discord from 'discord.js';
-import Pino from 'pino';
 
+import { log } from './modules/logger';
 import { extractUrl } from './utils';
 import { handleMusic } from './modules/music';
 
@@ -11,7 +11,6 @@ const {
 } = process.env;
 
 const client = new Discord.Client();
-const log = Pino();
 
 client.on('ready', () => {
   log.info(`Logged in as ${client.user?.tag}`);

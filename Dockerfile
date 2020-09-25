@@ -8,7 +8,7 @@ RUN [ "yarn", "build" ]
 FROM node:lts-alpine
 WORKDIR /var/app
 COPY [ "package.json", "yarn.lock", "./" ]
-ENTRYPOINT [ "node", "dist/main.js" ]
+ENTRYPOINT [ "yarn", "start" ]
 ENV NODE_ENV production
 RUN [ "yarn", "install", "--frozen-lockfile" ]
 COPY --from=builder [ "/var/app/dist", "./dist" ]

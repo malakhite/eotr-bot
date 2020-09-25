@@ -27,7 +27,7 @@
     "typed-rest-client": "^1.7.3"
   },
   "scripts": {
-    "run": "node dist/main.js",
+    "start": "node dist/main.js",
     "build": "tsc",
     "lint": "eslint --fix",
     "clean": "rimraf dist",
