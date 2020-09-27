@@ -76,6 +76,7 @@ export async function handleMusic(urls: URL[]) {
     'https://open.spotify.com/track/',
     'https://www.youtube.com/watch',
     'https://youtube.com/watch',
+    'https://youtu.be/',
   ];
 
   const reportableServices = {
