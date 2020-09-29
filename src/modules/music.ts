@@ -9,6 +9,7 @@ export async function handleMusic(urls: URL[]) {
   const musicSources = [
     'https://listen.tidal.com/track/',
     'https://tidal.com/browse/track/',
+    'https://tidal.com/track/',
     'https://music.apple.com/',
     'https://www.pandora.com/artist/',
     'https://open.spotify.com/track/',
