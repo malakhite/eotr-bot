@@ -21,16 +21,16 @@ client.on('message', async (msg) => {
     channel,
     content,
   } = msg;
-  if (channel.id === DISCORD_MUSIC_CHANNEL) {
+  if (channel.id === DISCORD_MUSIC_CHANNEL || content.startsWith('!music')) {
     try {
       const urls = extractUrl(content);
       const result = await handleMusic(urls);
       channel.send(result);
     } catch (e) {
-      if (e.message === 'No URLs identified') {
-        log.debug(`${e.message} in ${content}`);
+      if (e.message === 'No URLs identified' || e.message === 'No music URLs identified') {
+        log.debug({ type: 'error', message: `${e.message} in ${content}` });
       } else {
-        log.error(e);
+        log.error({ type: 'error', error_details: e });
       }
     }
   }
