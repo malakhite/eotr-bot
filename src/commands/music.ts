@@ -17,6 +17,7 @@ async function handleMusic(urls: URL[]) {
     'https://www.youtube.com/watch',
     'https://youtube.com/watch',
     'https://youtu.be/',
+    'https://music.youtube.com/watch',
   ];
 
   const reportableServices = {
@@ -24,6 +25,7 @@ async function handleMusic(urls: URL[]) {
     spotify: 'Spotify',
     tidal: 'Tidal',
     youtube: 'YouTube',
+    youtubeMusic: 'YouTube Music',
   } as const;
   type ReportableServices = typeof reportableServices;
   type ReportableService = keyof ReportableServices;
@@ -33,9 +35,7 @@ async function handleMusic(urls: URL[]) {
   );
 
   if (!firstMusicUrl) {
-    const error = new Error('No music URLs identified');
-    log.error({ type: 'error', error_message: error });
-    throw error;
+    throw new Error('No music URLs identified');
   }
   const songwhipClient = new rm.RestClient('music-fetcher', SONGWHIP_URL);
   const payload = {

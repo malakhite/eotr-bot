@@ -6,5 +6,5 @@ export function extractUrl(input: string) {
   if (Array.isArray(matches)) {
     return matches.map((url) => new URL(url));
   }
-  throw Error('No URLs identified');
+  throw new Error('No URLs identified');
 }
