@@ -16,6 +16,7 @@ server.addContentTypeParser('multipart/form-data', async function (
   payload: Fastify.RawRequestDefaultExpression
 ) {
   const body = await toString(payload);
+  console.log(body);
   const json = JSON.parse(body);
   return json;
 } as Fastify.FastifyContentTypeParser);
