@@ -67,7 +67,7 @@ const { DISCORD_PLEX_CHANNEL } = process.env;
 
 // export default handleUpdate;
 
-const handleUpdate = (fastify: FastifyInstance) => {
+export default async function handleUpdate(fastify: FastifyInstance) {
   fastify.post<{ Body: MessageType }>(
     '/updates',
     { schema: { body: Message } },
@@ -76,6 +76,4 @@ const handleUpdate = (fastify: FastifyInstance) => {
       console.log(body);
     }
   );
-};
-
-export default handleUpdate;
+}
