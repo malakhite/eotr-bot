@@ -1,6 +1,6 @@
 import { FastifyInstance, RouteOptions } from 'fastify';
 import { Static, Type } from '@sinclair/typebox';
-import toString from 'stream-to-string';
+import fp from 'fastify-plugin';
 
 const Message = Type.Object({
   event: Type.String(),
@@ -67,7 +67,7 @@ const { DISCORD_PLEX_CHANNEL } = process.env;
 
 // export default handleUpdate;
 
-export default async function handleUpdate(fastify: FastifyInstance) {
+async function handleUpdate(fastify: FastifyInstance) {
   fastify.post<{ Body: MessageType }>(
     '/updates',
     { schema: { body: Message } },
@@ -77,3 +77,5 @@ export default async function handleUpdate(fastify: FastifyInstance) {
     }
   );
 }
+
+export default fp(handleUpdate);
