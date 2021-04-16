@@ -77,7 +77,7 @@ async function handleUpdate(fastify: FastifyInstance) {
   fastify.route<{ Body: MessageType }>({
     method: 'POST',
     url: '/updates',
-    schema: { body: Message },
+    // schema: { body: Message },
     preHandler: upload.single('thumb'),
     preValidation: async (request, reply) => {
       console.log(request.body);
