@@ -1,7 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { log } from '../modules/logger';
-
-import commands from '../modules/commands';
+import { FastifyInstance } from 'fastify';
+import commands from './index';
 
 const { PREFIX = '!' } = process.env;
 
@@ -16,7 +15,7 @@ export default {
     },
   ],
   args: false,
-  async execute(message: Message, args: string[]) {
+  async execute(message: Message, args: string[], fastify: FastifyInstance) {
     const { author } = message;
 
     if (args.length && commands.has(args[0])) {
@@ -42,7 +41,7 @@ export default {
           .addFields(fields);
         return dm.send(reply);
       } catch (e) {
-        log.error({ type: 'error', error_message: e });
+        fastify.log.error(e);
       }
     }
 
@@ -61,7 +60,7 @@ export default {
         .addFields(mappedCommands);
       return dm.send(reply);
     } catch (e) {
-      log.error({ type: 'error', error_details: e });
+      fastify.log.error(e);
     }
   },
 };

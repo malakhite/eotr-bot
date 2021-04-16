@@ -1,6 +1,6 @@
 import Discord, { Message, MessageEmbed } from 'discord.js';
-import roles from '../config/roles.json';
-import { log } from '../modules/logger';
+import { FastifyInstance } from 'fastify';
+import roles from '../../../config/roles.json';
 
 interface RoleSpec {
   name: string;
@@ -26,7 +26,8 @@ export default {
     { detail: 'list', description: 'Lists available rooms' },
   ],
   args: true,
-  async execute(message: Message, args: string[]) {
+  aliases: ['spoiler'],
+  async execute(message: Message, args: string[], fastify: FastifyInstance) {
     const { author, guild } = message;
     const guildMember = guild?.member(author);
     const [action, room] = args;
@@ -69,7 +70,7 @@ export default {
           return message.reply(`I don't understand ${action}.`);
       }
     } catch (e) {
-      log.error({ type: 'error', error_details: e });
+      fastify.log.error(e);
     }
   },
 };

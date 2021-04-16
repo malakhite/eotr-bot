@@ -1,4 +1,5 @@
 import { Message } from 'discord.js';
+import { FastifyInstance } from 'fastify';
 
 export default interface Command {
   name: string;
@@ -8,5 +9,6 @@ export default interface Command {
     description: string;
   }[];
   args: boolean;
-  execute: (msg: Message, args: string[]) => void;
+  aliases?: string[];
+  execute: (msg: Message, args: string[], fastify?: FastifyInstance) => void;
 }

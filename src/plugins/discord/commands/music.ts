@@ -1,12 +1,12 @@
 import { URL } from 'url';
 import * as rm from 'typed-rest-client/RestClient';
 import { Message, MessageEmbed } from 'discord.js';
-import { SONGWHIP_URL } from '../constants';
-import { log } from '../modules/logger';
+import { SONGWHIP_URL } from '../../../constants';
 import { MusicSources } from '../interfaces/music';
-import { extractUrl } from '../utils';
+import { extractUrl } from '../../../utils';
+import { FastifyInstance } from 'fastify';
 
-async function handleMusic(urls: URL[]) {
+async function handleMusic(urls: URL[], fastify: FastifyInstance) {
   const musicSources = [
     'https://listen.tidal.com/track/',
     'https://tidal.com/browse/track/',
@@ -43,14 +43,14 @@ async function handleMusic(urls: URL[]) {
     country: 'US',
   };
 
-  log.info({ type: 'request', path: `${SONGWHIP_URL}api`, payload });
+  fastify.log.info({ type: 'request', path: `${SONGWHIP_URL}api`, payload });
   const response = await songwhipClient.create<MusicSources>('api', payload);
 
   if (response.statusCode !== 200) {
-    log.error({ type: 'error', ...response });
+    fastify.log.error(response);
   }
   if (response.result?.data) {
-    log.info({ type: 'response', ...response });
+    fastify.log.info({ type: 'response', ...response });
     const {
       result: {
         data: { links },
@@ -84,21 +84,21 @@ export default {
     },
   ],
   args: true,
-  async execute(message: Message, args: string[]) {
+  async execute(message: Message, args: string[], fastify: FastifyInstance) {
     const { channel, content } = message;
     try {
       const urls = extractUrl(content);
-      const result = await handleMusic(urls);
+      const result = await handleMusic(urls, fastify);
       channel.send(result);
     } catch (e) {
       if (
         e.message === 'No URLs identified' ||
         e.message === 'No music URLs identified'
       ) {
-        log.debug({ type: 'error', message: `${e.message} in ${content}` });
+        fastify.log.debug(`${e.message} in ${content}`);
         message.reply(e.message);
       } else {
-        log.error({ type: 'error', error_details: e });
+        fastify.log.error(e);
       }
     }
   },
