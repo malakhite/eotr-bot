@@ -1,5 +1,6 @@
-import { RouteOptions } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { FastifyInstance, RouteOptions } from 'fastify';
+import { Static, Type } from '@sinclair/typebox';
+import toString from 'stream-to-string';
 
 const Message = Type.Object({
   event: Type.String(),
@@ -45,21 +46,36 @@ const Message = Type.Object({
     updatedAt: Type.Number(),
   }),
 });
+export type MessageType = Static<typeof Message>;
 
 const { DISCORD_PLEX_CHANNEL } = process.env;
 
-const handleUpdate: RouteOptions = {
-  method: 'POST',
-  url: '/updates',
-  schema: {
-    body: Message,
-  },
-  handler: async function (request, reply) {
-    const client = this.discord;
-    const { body } = request;
-    this.log.info(body);
-    reply.status(201).send();
-  },
+// const handleUpdate = {
+//   method: 'POST',
+//   url: '/updates',
+//   schema: {
+//     body: Message,
+//   },
+//   handler: async function (request, reply) {
+//     const client = this.discord;
+//     const {
+//       body: { payload, thumb },
+//     } = request;
+//     this.log.info(body);
+//   },
+// } as RouteOptions;
+
+// export default handleUpdate;
+
+const handleUpdate = (fastify: FastifyInstance) => {
+  fastify.post<{ Body: MessageType }>(
+    '/updates',
+    { schema: { body: Message } },
+    async (request, response) => {
+      const { body } = request;
+      console.log(body);
+    }
+  );
 };
 
 export default handleUpdate;
