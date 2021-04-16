@@ -79,11 +79,9 @@ async function handleUpdate(fastify: FastifyInstance) {
     url: '/updates',
     // schema: { body: Message },
     preHandler: upload.single('thumb'),
-    preValidation: async (request, reply) => {
-      console.log(request.body);
-    },
     handler: async (request, response) => {
-      const { body } = request;
+      console.log(request);
+      response.send();
     },
   });
 }
