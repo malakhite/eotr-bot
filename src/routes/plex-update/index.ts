@@ -1,6 +1,10 @@
 import { FastifyInstance, RouteOptions } from 'fastify';
+import multer from 'fastify-multer';
 import { Static, Type } from '@sinclair/typebox';
 import fp from 'fastify-plugin';
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const Message = Type.Object({
   payload: Type.Object({
@@ -74,6 +78,7 @@ async function handleUpdate(fastify: FastifyInstance) {
     method: 'POST',
     url: '/updates',
     schema: { body: Message },
+    preHandler: upload.single('thumb'),
     preValidation: async (request, reply) => {
       console.log(request.body);
     },
