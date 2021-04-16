@@ -28,6 +28,7 @@
     "fastify": "^3.14.2",
     "fastify-plugin": "^3.0.0",
     "pino": "^6.6.1",
+    "stream-to-string": "^1.2.0",
     "typed-rest-client": "^1.7.3"
   },
   "scripts": {
