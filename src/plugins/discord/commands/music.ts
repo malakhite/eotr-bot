@@ -43,14 +43,18 @@ async function handleMusic(urls: URL[], fastify: FastifyInstance) {
     country: 'US',
   };
 
-  fastify.log.info({ type: 'request', path: `${SONGWHIP_URL}api`, payload });
+  fastify.log.info({
+    type: 'outgoing-request',
+    path: `${SONGWHIP_URL}api`,
+    payload,
+  });
   const response = await songwhipClient.create<MusicSources>('api', payload);
 
   if (response.statusCode !== 200) {
     fastify.log.error(response);
   }
   if (response.result?.data) {
-    fastify.log.info({ type: 'response', ...response });
+    fastify.log.info({ type: 'incoming-response', ...response });
     const {
       result: {
         data: { links },
