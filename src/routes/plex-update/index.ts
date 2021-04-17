@@ -68,7 +68,7 @@ async function handleUpdate(fastify: FastifyInstance) {
     preHandler: upload.single('thumb'),
     handler: async (request, response) => {
       const payload = JSON.parse(request.body.payload) as ParsedMessageType;
-      fastify.log.info({ type: 'incoming-response', payload });
+      fastify.log.info({ type: 'incoming-request', payload });
       if (payload.event === 'library.new') {
         const client = fastify.discord;
         const channel = client.channels.cache.get(
