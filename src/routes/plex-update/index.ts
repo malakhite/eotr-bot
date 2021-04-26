@@ -76,7 +76,13 @@ async function handleUpdate(fastify: FastifyInstance) {
         ) as TextChannel;
         if (payload.Metadata.librarySectionType === 'show') {
           channel.send(
-            `${payload.Metadata.grandparentTitle} - ${payload.Metadata.parentTitle} - ${payload.Metadata.title} has been added`
+            `${[
+              payload.Metadata.grandparentTitle,
+              payload.Metadata.parentTitle,
+              payload.Metadata.title,
+            ]
+              .filter((item) => !!item)
+              .join(' - ')} has been added`
           );
         }
         if (payload.Metadata.librarySectionType === 'movie') {
