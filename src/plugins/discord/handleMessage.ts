@@ -27,7 +27,7 @@ async function handleMessage(msg: Message, fastify: FastifyInstance) {
   }
 
   if (command && command.args && !args.length) {
-    return msg.reply(`you didn't provide any arguments`);
+    return msg.reply("you didn't provide any arguments");
   }
 
   try {

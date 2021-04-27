@@ -93,7 +93,7 @@ export default {
     try {
       const urls = extractUrl(content);
       const result = await handleMusic(urls, fastify);
-      channel.send(result);
+      await channel.send(result);
     } catch (e) {
       if (
         e.message === 'No URLs identified' ||

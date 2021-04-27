@@ -75,7 +75,7 @@ async function handleUpdate(fastify: FastifyInstance) {
           DISCORD_PLEX_CHANNEL!
         ) as TextChannel;
         if (payload.Metadata.librarySectionType === 'show') {
-          channel.send(
+          await channel.send(
             `${[
               payload.Metadata.grandparentTitle,
               payload.Metadata.parentTitle,
@@ -86,7 +86,7 @@ async function handleUpdate(fastify: FastifyInstance) {
           );
         }
         if (payload.Metadata.librarySectionType === 'movie') {
-          channel.send(`${payload.Metadata.title} has been added`);
+          await channel.send(`${payload.Metadata.title} has been added`);
         }
       }
       response.send();
