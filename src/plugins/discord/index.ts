@@ -15,6 +15,11 @@ declare module 'fastify' {
 async function discordPlugin(fastify: FastifyInstance) {
   const client = new Discord.Client();
 
+  fastify.addHook('onClose', (instance, done) => {
+    client.destroy();
+    done();
+  });
+
   client.on('ready', () => {
     fastify.log.info(`connected to Discord as ${client.user?.tag}`);
   });
