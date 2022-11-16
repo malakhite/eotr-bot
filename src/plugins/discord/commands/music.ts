@@ -1,10 +1,11 @@
 import { URL } from 'url';
 import * as rm from 'typed-rest-client/RestClient';
 import { Message, MessageEmbed } from 'discord.js';
+import type { FastifyInstance } from 'fastify';
+
 import { SONGWHIP_URL } from '../../../constants';
-import { MusicSources } from '../interfaces/music';
 import { extractUrl } from '../../../utils';
-import { FastifyInstance } from 'fastify';
+import type { SongwhipResponse } from '../interfaces/music';
 
 async function handleMusic(urls: URL[], fastify: FastifyInstance) {
   const musicSources = [
@@ -48,16 +49,21 @@ async function handleMusic(urls: URL[], fastify: FastifyInstance) {
     path: `${SONGWHIP_URL}api`,
     payload,
   });
-  const response = await songwhipClient.create<MusicSources>('api', payload);
+  const response = await songwhipClient.create<SongwhipResponse>(
+    'api',
+    payload
+  );
 
   if (response.statusCode !== 200) {
     fastify.log.error(response);
   }
-  if (response.result?.data) {
+  if (response.result?.status === 'success') {
     fastify.log.info({ type: 'incoming-response', ...response });
     const {
       result: {
-        data: { links },
+        data: {
+          item: { links },
+        },
       },
     } = response;
     const mappedLinks = Object.entries(links)
@@ -96,8 +102,9 @@ export default {
       await channel.send(result);
     } catch (e) {
       if (
-        e.message === 'No URLs identified' ||
-        e.message === 'No music URLs identified'
+        e instanceof Error &&
+        (e.message === 'No URLs identified' ||
+          e.message === 'No music URLs identified')
       ) {
         fastify.log.debug(`${e.message} in ${content}`);
         message.reply(e.message);

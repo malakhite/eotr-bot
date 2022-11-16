@@ -1,63 +1,86 @@
-interface Artist {
-  type: 'artist'
-  id: number
-  path: string
-  name: string
-  sourceUrl: string
-  sourceCountry: string
-  url: string
-  image: string
-  createdAt: string
-  updatedAt: string
-  refreshedAt: string
-  serviceIds: object
-  config: any | null
-  teamId: any | null
-  overrides: any | null
-}
+type MusicProvider =
+  | 'qobuz'
+  | 'tidal'
+  | 'amazon'
+  | 'deezer'
+  | 'itunes'
+  | 'napster'
+  | 'pandora'
+  | 'spotify'
+  | 'twitter'
+  | 'youtube'
+  | 'facebook'
+  | 'instagram'
+  | 'lineMusic'
+  | 'amazonMusic'
+  | 'itunesStore'
+  | 'musicBrainz'
+  | 'youtubeMusic';
+
+type MusicLinks = Partial<Record<MusicProvider, MusicSource[]>>;
 
 interface MusicSource {
-  link: string
-  countries: string[]
+  link: string;
+  countries: string[];
 }
 
-interface MusicSources {
-  status: string
+interface MusicItem {
+  id: number;
+  path: string;
+  name: string;
+  url: string;
+  sourceUrl: string;
+  sourceCountry: string;
+  releaseDate: string;
+  createdAt: string;
+  updatedAt: string;
+  refreshedAt: string;
+  image: string;
+  isrc: string;
+  links: MusicLinks;
+  linksCountries: string[];
+}
+
+interface Artist extends MusicItem {
+  type: 'artist';
+  description: string;
+  serviceIds: Partial<Record<MusicProvider, string>>;
+  orchardId: string;
+  spotifyId: string;
+}
+
+interface Track extends MusicItem {
+  type: 'track';
+  artists: Artist[];
+}
+
+interface SongwhipSuccess {
+  status: 'success';
   data: {
-    type: string
-    id: number
-    path: string
-    name: string
-    url: string
-    sourceUrl: string
-    sourceCountry: string
-    releaseDate: string
-    createdAt: string
-    updatedAt: string
-    refreshedAt: string
-    image: string
-    config: any | null
-    links: {
-      tidal?: MusicSource[]
-      amazon?: MusicSource[]
-      deezer?: MusicSource[]
-      itunes?: MusicSource[]
-      napster?: MusicSource[]
-      pandora?: MusicSource[]
-      spotify?: MusicSource[]
-      youtube?: MusicSource[]
-      googleplay?: MusicSource[]
-      soundcloud?: MusicSource[]
-      amazonMusic?: MusicSource[]
-      itunesStore?: MusicSource[]
-      youtubeMusic?: MusicSource[]
-      googleplayStore?: MusicSource[]
-    }
-    linksOverride: any | null
-    linksCountries: string[]
-    artists: Artist[]
-    overrides: any | null
-  }
+    item: Track;
+  };
 }
 
-export { Artist, MusicSource, MusicSources };
+interface SongwhipError {
+  status: 'error';
+  error: {
+    status: number;
+    message: string;
+    data: {
+      url: string;
+    };
+  };
+}
+
+type SongwhipResponse = SongwhipSuccess | SongwhipError;
+
+export {
+  Artist,
+  Track,
+  MusicLinks,
+  MusicProvider,
+  MusicSource,
+  SongwhipError,
+  SongwhipResponse,
+  SongwhipSuccess,
+};
