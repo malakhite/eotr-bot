@@ -1,39 +1,33 @@
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import Discord, { Client } from 'discord.js';
-
-import handleMessage from './handleMessage';
-
-const { DISCORD_TOKEN } = process.env;
+import Discord, { Client, GatewayIntentBits } from 'discord.js';
+import { Bot } from './bot';
 
 declare module 'fastify' {
-  interface FastifyInstance {
-    discord: Client;
-  }
+	interface FastifyInstance {
+		discord: Client;
+	}
 }
 
 async function discordPlugin(fastify: FastifyInstance) {
-  const client = new Discord.Client();
+	const client = new Discord.Client({
+		intents: [
+			GatewayIntentBits.Guilds,
+			GatewayIntentBits.GuildMessages,
+			GatewayIntentBits.MessageContent,
+		],
+	});
 
-  fastify.addHook('onClose', (instance, done) => {
-    client.destroy();
-    done();
-  });
+	fastify.addHook('onClose', (instance, done) => {
+		client.destroy();
+		done();
+	});
 
-  client.on('ready', () => {
-    fastify.log.info(`connected to Discord as ${client.user?.tag}`);
-  });
+	if (!fastify.discord) {
+		fastify.decorate('discord', client);
+	}
 
-  client.on('message', (msg) => handleMessage(msg, fastify));
-  client.on('disconnect', () => {
-    fastify.log.warn('disconnected from Discord');
-  });
-
-  client.login(DISCORD_TOKEN);
-
-  if (!fastify.discord) {
-    fastify.decorate('discord', client);
-  }
+	const bot = new Bot(fastify);
 }
 
 export default fp(discordPlugin);

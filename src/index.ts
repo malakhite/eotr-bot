@@ -1,20 +1,30 @@
 import 'dotenv/config';
 import * as Fastify from 'fastify';
 import multer from 'fastify-multer';
+import config from './plugins/config';
 import discordPlugin from './plugins/discord';
 import handleUpdate, { MessageType } from './routes/plex-update';
 
-const { PORT = 8080 } = process.env;
+(async function main() {
+	const server = Fastify.fastify({
+		logger: { level: process.env.LOG_LEVEL || 'info' },
+	});
 
-const server = Fastify.fastify({ logger: { level: 'info' } });
+	await server.register(config);
+	await server.register(handleUpdate);
+	await server.register(discordPlugin);
+	await server.register(multer.contentParser);
 
-server.register(handleUpdate);
-server.register(discordPlugin);
-server.register(multer.contentParser);
-
-server.listen(PORT, '0.0.0.0', (err, address) => {
-  if (err) {
-    server.log.error(err);
-    process.exit(1);
-  }
-});
+	server.listen(
+		{
+			host: server.config.HOST,
+			port: server.config.PORT,
+		},
+		(err, _address) => {
+			if (err) {
+				server.log.error(err);
+				process.exit(1);
+			}
+		},
+	);
+})();

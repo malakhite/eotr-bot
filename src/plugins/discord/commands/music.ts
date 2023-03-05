@@ -1,116 +1,111 @@
-import { URL } from 'url';
+import {
+	APIEmbedField,
+	EmbedBuilder,
+	SlashCommandBuilder,
+	TextChannel,
+} from 'discord.js';
+import { FastifyInstance } from 'fastify';
 import * as rm from 'typed-rest-client/RestClient';
-import { Message, MessageEmbed } from 'discord.js';
-import type { FastifyInstance } from 'fastify';
+import { SONGWHIP_URL } from '../../../config/music';
+import type Command from '../interfaces/commands';
+import { MusicProvider, SongwhipResponse } from '../interfaces/music';
 
-import { SONGWHIP_URL } from '../../../constants';
-import { extractUrl } from '../../../utils';
-import type { SongwhipResponse } from '../interfaces/music';
+type OurProviders = Extract<
+	MusicProvider,
+	'itunes' | 'amazonMusic' | 'spotify' | 'tidal' | 'youtube' | 'youtubeMusic'
+>;
 
-async function handleMusic(urls: URL[], fastify: FastifyInstance) {
-  const musicSources = [
-    'https://listen.tidal.com/track/',
-    'https://tidal.com/browse/track/',
-    'https://tidal.com/track/',
-    'https://music.apple.com/',
-    'https://www.pandora.com/artist/',
-    'https://open.spotify.com/track/',
-    'https://www.youtube.com/watch',
-    'https://youtube.com/watch',
-    'https://youtu.be/',
-    'https://music.youtube.com/watch',
-  ];
+const reportableServices: Record<OurProviders, string> = {
+	amazonMusic: 'Amazon Music',
+	itunes: 'Apple Music',
+	spotify: 'Spotify',
+	tidal: 'Tidal',
+	youtube: 'YouTube',
+	youtubeMusic: 'YouTube Music',
+};
 
-  const reportableServices = {
-    itunes: 'Apple Music',
-    spotify: 'Spotify',
-    tidal: 'Tidal',
-    youtube: 'YouTube',
-    youtubeMusic: 'YouTube Music',
-  } as const;
-  type ReportableServices = typeof reportableServices;
-  type ReportableService = keyof ReportableServices;
+async function handleMusic(url: URL, server: FastifyInstance) {
+	const songwhipClient = new rm.RestClient('music-fetcher', SONGWHIP_URL);
+	const payload = {
+		url: url.toString(),
+		country: 'US',
+	};
 
-  const [firstMusicUrl] = urls.filter((url) =>
-    musicSources.some((source) => url.toString().includes(source))
-  );
+	server.log.info({
+		type: 'outgoing-request',
+		path: `${SONGWHIP_URL}api`,
+		payload,
+	});
 
-  if (!firstMusicUrl) {
-    throw new Error('No music URLs identified');
-  }
-  const songwhipClient = new rm.RestClient('music-fetcher', SONGWHIP_URL);
-  const payload = {
-    url: firstMusicUrl.toString(),
-    country: 'US',
-  };
+	const response = await songwhipClient.create<SongwhipResponse>(
+		'api',
+		payload,
+	);
 
-  fastify.log.info({
-    type: 'outgoing-request',
-    path: `${SONGWHIP_URL}api`,
-    payload,
-  });
-  const response = await songwhipClient.create<SongwhipResponse>(
-    'api',
-    payload
-  );
+	if (response.result?.status !== 'success') {
+		server.log.error(response);
+	} else {
+		const {
+			result: {
+				data: {
+					item: {
+						name: track,
+						url: songwhipUrl,
+						links: linkResults,
+						artists: [{ name: artist }],
+					},
+				},
+			},
+		} = response;
 
-  if (response.statusCode !== 200) {
-    fastify.log.error(response);
-  }
-  if (response.result?.status === 'success') {
-    fastify.log.info({ type: 'incoming-response', ...response });
-    const {
-      result: {
-        data: {
-          item: { links },
-        },
-      },
-    } = response;
-    const mappedLinks = Object.entries(links)
-      .filter(
-        ([key, value]) =>
-          value![0] && Object.keys(reportableServices).includes(key)
-      )
-      .map(([serviceName, serviceInfo]) => ({
-        name: reportableServices[serviceName as ReportableService],
-        value: serviceInfo![0].link.replace('{country}', 'us'),
-      }));
-    return new MessageEmbed()
-      .setTitle('More sources')
-      .addFields(mappedLinks)
-      .setTimestamp();
-  }
+		const links = Object.keys(reportableServices).reduce((acc, service) => {
+			if (linkResults[service as OurProviders]) {
+				const result = linkResults[service as OurProviders]!;
+				if (result.length && result.length > 0) {
+					acc.push(
+						...result.map((source) => ({
+							name: reportableServices[service as OurProviders],
+							value: source.link.replaceAll('{country}', 'US'),
+						})),
+					);
+				}
+			}
 
-  throw Error(`Something went wrong. The response was: ${response}`);
+			return acc;
+		}, [] as APIEmbedField[]);
+
+		const sources = new EmbedBuilder()
+			.setTitle(`${track} by ${artist}`)
+			.setURL(`https://songwhip.com${songwhipUrl}`)
+			.addFields(...links);
+
+		return [sources];
+	}
 }
 
-export default {
-  name: 'music',
-  description: 'Get alternative music sources',
-  usage: [
-    {
-      detail: '<music service URL>',
-      description: 'Gets music sources based on the URL provided',
-    },
-  ],
-  args: true,
-  async execute(message: Message, args: string[], fastify: FastifyInstance) {
-    const { channel, content } = message;
-    try {
-      const urls = extractUrl(content);
-      const result = await handleMusic(urls, fastify);
-      await channel.send(result);
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        (e.message === 'No URLs identified' ||
-          e.message === 'No music URLs identified')
-      ) {
-        fastify.log.debug(`${e.message} in ${content}`);
-        message.reply(e.message);
-      } else {
-        fastify.log.error(e);
-      }
-    }
-  },
+const music: Command = {
+	data: new SlashCommandBuilder()
+		.setName('music')
+		.setDescription('Search for music streaming sources.')
+		.addStringOption((option) => {
+			return option
+				.setName('url')
+				.setDescription('The URL of a music streaming source.')
+				.setRequired(true);
+		}),
+	execute: async function execute(server, interaction) {
+		const url = interaction.options.getString('url');
+		if (!url) {
+			throw new Error('No URL entered.');
+		}
+		const embeds = await handleMusic(new URL(url), server);
+		if (embeds && interaction.channel instanceof TextChannel) {
+			return interaction.reply({ embeds });
+		}
+		return interaction.reply({
+			content: 'No other sources found.',
+		});
+	},
 };
+
+export default music;

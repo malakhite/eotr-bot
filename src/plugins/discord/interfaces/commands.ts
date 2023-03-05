@@ -1,14 +1,15 @@
-import { Message } from 'discord.js';
+import type {
+	ChatInputCommandInteraction,
+	InteractionResponse,
+	Message,
+	SlashCommandBuilder,
+} from 'discord.js';
 import { FastifyInstance } from 'fastify';
 
 export default interface Command {
-  name: string;
-  description: string;
-  usage: {
-    detail: string;
-    description: string;
-  }[];
-  args: boolean;
-  aliases?: string[];
-  execute: (msg: Message, args: string[], fastify?: FastifyInstance) => void;
+	data: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+	execute: (
+		server: FastifyInstance,
+		interaction: ChatInputCommandInteraction,
+	) => Promise<InteractionResponse>;
 }
