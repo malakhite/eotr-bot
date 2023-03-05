@@ -1,14 +1,14 @@
 FROM node:lts-alpine AS builder
 WORKDIR /var/app
-COPY [ "package.json", "yarn.lock", "./" ]
-RUN [ "yarn", "install", "--frozen-lockfile" ]
+COPY [ "package.json", "pnpm-lock.yaml", "./" ]
+RUN [ "pnpm", "install", "--frozen-lockfile" ]
 COPY [ "./", "./" ]
-RUN [ "yarn", "build" ]
+RUN [ "pnpm", "build" ]
 
 FROM node:lts-alpine
 WORKDIR /var/app
-COPY [ "package.json", "yarn.lock", "./" ]
-ENTRYPOINT [ "yarn", "start" ]
+COPY [ "package.json", "pnpm-lock.yaml", "./" ]
+ENTRYPOINT [ "pnpm", "start" ]
 ENV NODE_ENV production
-RUN [ "yarn", "install", "--frozen-lockfile" ]
+RUN [ "pnpm", "install", "--frozen-lockfile" ]
 COPY --from=builder [ "/var/app/dist", "./dist" ]
