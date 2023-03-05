@@ -101,9 +101,9 @@ const music: Command = {
 		await interaction.deferReply();
 		const embeds = await handleMusic(new URL(url), server);
 		if (embeds && interaction.channel instanceof TextChannel) {
-			return interaction.reply({ embeds });
+			return interaction.editReply({ embeds });
 		}
-		return interaction.reply({
+		return interaction.editReply({
 			content: 'No other sources found.',
 		});
 	},

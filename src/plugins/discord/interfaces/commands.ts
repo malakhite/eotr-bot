@@ -11,5 +11,5 @@ export default interface Command {
 	execute: (
 		server: FastifyInstance,
 		interaction: ChatInputCommandInteraction,
-	) => Promise<InteractionResponse>;
+	) => Promise<InteractionResponse | Message>;
 }
