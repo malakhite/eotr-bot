@@ -98,6 +98,7 @@ const music: Command = {
 		if (!url) {
 			throw new Error('No URL entered.');
 		}
+		await interaction.deferReply();
 		const embeds = await handleMusic(new URL(url), server);
 		if (embeds && interaction.channel instanceof TextChannel) {
 			return interaction.reply({ embeds });
