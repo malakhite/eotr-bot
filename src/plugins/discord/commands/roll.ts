@@ -37,6 +37,7 @@ const roll: Command = {
 		server.log.debug({ dice, total });
 		const embed = new EmbedBuilder()
 			.setTitle('Roll result')
+			.setDescription(`Rolled ${count}D${sides}`)
 			.addFields(
 				{ name: 'Die rolls', value: dice.join(', ') },
 				{ name: 'Total', value: total.toString() },
@@ -47,7 +48,5 @@ const roll: Command = {
 		});
 	},
 };
-
-console.log(roll.data.name);
 
 export default roll;

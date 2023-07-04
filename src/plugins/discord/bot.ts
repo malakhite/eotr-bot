@@ -47,7 +47,6 @@ export class Bot {
 			if (!command) {
 				throw new Error(`Unable to load command from file ${file}`);
 			}
-			console.log(command);
 			this.slashCommands.push(command.default.data);
 			this.slashCommandsMap.set(command.default.data.name, command.default);
 		}
