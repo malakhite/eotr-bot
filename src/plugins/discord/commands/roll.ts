@@ -20,6 +20,7 @@ const roll: Command = {
 	execute: async function execute(server, interaction) {
 		const count = interaction.options.getNumber('count');
 		const sides = interaction.options.getNumber('sides');
+		server.log.debug({ count, sides });
 		if (!count) {
 			throw new Error('No count entered');
 		}
@@ -34,6 +35,7 @@ const roll: Command = {
 			return (acc += curr);
 		}, 0);
 
+		server.log.debug({ dice, total });
 		const embed = new EmbedBuilder()
 			.setTitle('Roll result')
 			.addFields(
@@ -41,10 +43,12 @@ const roll: Command = {
 				{ name: 'Total', value: total.toString() },
 			);
 
-		return interaction.editReply({
+		return interaction.reply({
 			embeds: [embed],
 		});
 	},
 };
+
+console.log(roll.data.name);
 
 export default roll;

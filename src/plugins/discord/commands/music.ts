@@ -5,10 +5,10 @@ import {
 	TextChannel,
 } from 'discord.js';
 import { FastifyInstance } from 'fastify';
-import * as rm from 'typed-rest-client/RestClient';
+import * as rm from 'typed-rest-client';
 import { SONGWHIP_URL } from '../../../config/music';
 import type Command from '../interfaces/commands';
-import { MusicProvider, SongwhipResponse } from '../interfaces/music';
+import type { MusicProvider, SongwhipResponse } from '../interfaces/music';
 
 type OurProviders = Extract<
 	MusicProvider,

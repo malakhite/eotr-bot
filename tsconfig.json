@@ -1,9 +1,10 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": "src",
-    "outDir": "dist",
-    "resolveJsonModule": true,
-    "strict": true
-  }
+	"extends": "@tsconfig/node18/tsconfig.json",
+	"compilerOptions": {
+		"baseUrl": "src",
+		"outDir": "dist",
+		"resolveJsonModule": true,
+		"module": "CommonJS",
+		"moduleResolution": "Node"
+	}
 }

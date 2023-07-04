@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { parseEnv } from 'znv';
@@ -8,6 +9,8 @@ declare module 'fastify' {
 		config: typeof config;
 	}
 }
+
+dotenv.config();
 
 const config = parseEnv(process.env, {
 	PORT: z.number().default(8080),

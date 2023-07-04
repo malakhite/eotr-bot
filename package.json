@@ -1,44 +1,43 @@
 {
-  "name": "eotr-bot",
-  "version": "0.0.1",
-  "main": "dist/main.js",
-  "repository": "git@github.com:malakhite/eotr-bot.git",
-  "author": "Scott Abbey <scott@scottabbey.com>",
-  "license": "MIT",
-  "private": true,
-  "devDependencies": {
-    "@semantic-release/git": "^10.0.1",
-    "@tsconfig/node18": "^18.2.0",
-    "@types/node": "^20.3.3",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
-    "eslint": "^8.44.0",
-    "eslint-config-prettier": "^8.8.0",
-    "prettier": "^2.8.8",
-    "rimraf": "^5.0.1",
-    "semantic-release": "^21.0.6",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
-  },
-  "dependencies": {
-    "@sinclair/typebox": "^0.29.3",
-    "discord.js": "^14.11.0",
-    "dotenv": "^16.3.1",
-    "fastify": "^4.19.2",
-    "fastify-multer": "^2.0.3",
-    "fastify-plugin": "^4.5.0",
-    "pino": "^8.14.1",
-    "stream-to-string": "^1.2.1",
-    "typed-rest-client": "^1.8.11",
-    "znv": "^0.3.2",
-    "zod": "^3.21.4"
-  },
-  "scripts": {
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "build": "tsc",
-    "lint": "eslint --fix",
-    "clean": "rimraf dist",
-    "release": "semantic-release"
-  }
+	"name": "eotr-bot",
+	"version": "0.0.1",
+	"main": "dist/main.js",
+	"repository": "git@github.com:malakhite/eotr-bot.git",
+	"author": "Scott Abbey <scott@scottabbey.com>",
+	"license": "MIT",
+	"devDependencies": {
+		"@semantic-release/git": "^10.0.1",
+		"@tsconfig/node18": "^18.2.0",
+		"@types/node": "^20.3.3",
+		"@typescript-eslint/eslint-plugin": "^5.61.0",
+		"@typescript-eslint/parser": "^5.61.0",
+		"eslint": "^8.44.0",
+		"eslint-config-prettier": "^8.8.0",
+		"prettier": "^2.8.8",
+		"rimraf": "^5.0.1",
+		"semantic-release": "^21.0.6",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.1.6"
+	},
+	"dependencies": {
+		"@sinclair/typebox": "^0.29.3",
+		"discord.js": "^14.11.0",
+		"dotenv": "^16.3.1",
+		"fastify": "^4.19.2",
+		"fastify-multer": "^2.0.3",
+		"fastify-plugin": "^4.5.0",
+		"pino": "^8.14.1",
+		"stream-to-string": "^1.2.1",
+		"typed-rest-client": "^1.8.11",
+		"znv": "^0.3.2",
+		"zod": "^3.21.4"
+	},
+	"scripts": {
+		"start": "node dist/index.js",
+		"dev": "ts-node src/index.ts",
+		"build": "tsc",
+		"lint": "eslint --fix",
+		"clean": "rimraf dist",
+		"release": "semantic-release"
+	}
 }

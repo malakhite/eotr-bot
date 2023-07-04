@@ -1,9 +1,8 @@
-import 'dotenv/config';
 import * as Fastify from 'fastify';
 import multer from 'fastify-multer';
 import config from './plugins/config';
 import discordPlugin from './plugins/discord';
-import handleUpdate, { MessageType } from './routes/plex-update';
+import handleUpdate from './routes/plex-update';
 
 (async function main() {
 	const server = Fastify.fastify({
