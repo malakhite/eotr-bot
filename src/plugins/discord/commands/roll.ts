@@ -27,10 +27,9 @@ const roll: Command = {
 		if (!sides) {
 			throw new Error('Number of sides not entered');
 		}
-		const dice: number[] = [];
-		for (let i = 0; i < count; i++) {
-			dice.push(Math.floor(Math.random() * sides));
-		}
+		const dice: number[] = Array.from(new Array(count)).map(() =>
+			Math.floor(Math.random() * sides + 1),
+		);
 		const total = dice.reduce((acc, curr) => {
 			return (acc += curr);
 		}, 0);
