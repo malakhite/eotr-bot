@@ -1,17 +1,20 @@
 import {
 	ApplicationCommandDataResolvable,
-	Client,
 	Collection,
 	Events,
 	Interaction,
 	REST,
 	Routes,
+	TextChannel,
 } from 'discord.js';
 import { FastifyInstance } from 'fastify';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type Command from './interfaces/commands';
+import { WORDGAMES } from '../../constants';
+import dayjs from '../../lib/date-time';
+import { AsyncTask, CronJob, Task } from 'toad-scheduler';
 
 export class Bot {
 	public commands = new Collection<string, Command>();
@@ -32,6 +35,29 @@ export class Bot {
 		this.server.discord.on('error', this.server.log.error);
 
 		this.onInteractionCreate();
+
+		WORDGAMES.forEach((game) => {
+			const createThreadTask = new Task(`create ${game.game} thread`, () => {
+				return this.createWordGameThread(game);
+			});
+			const createThreadJob = new CronJob(
+				{ cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE },
+				createThreadTask,
+			);
+			this.server.scheduler.addCronJob(createThreadJob);
+
+			const archiveThreadTask = new AsyncTask(
+				`archive ${game.game} thread`,
+				() => {
+					return this.archiveWordGameThread(game);
+				},
+			);
+			const archiveThreadJob = new CronJob(
+				{ cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE },
+				archiveThreadTask,
+			);
+			this.server.scheduler.addCronJob(archiveThreadJob);
+		});
 	}
 
 	private async registerSlashCommands() {
@@ -87,5 +113,51 @@ export class Bot {
 				}
 			},
 		);
+	}
+
+	private createWordGameThread(game: (typeof WORDGAMES)[number]) {
+		const channel = this.server.discord.channels.cache.get(
+			this.server.config.DISCORD_WORD_GAMES_CHANNEL,
+		);
+
+		if (channel instanceof TextChannel) {
+			const tomorrow = dayjs().startOf('day').add(1, 'day');
+			const name = this.generateWordGameThreadName(game, tomorrow);
+			channel.threads.create({
+				name,
+			});
+		}
+	}
+
+	private async archiveWordGameThread(game: (typeof WORDGAMES)[number]) {
+		const today = dayjs().startOf('day');
+		const name = this.generateWordGameThreadName(game, today);
+		const channel = this.server.discord.channels.cache.get(
+			this.server.config.DISCORD_WORD_GAMES_CHANNEL,
+		);
+		if (channel instanceof TextChannel) {
+			const thread = channel.threads.cache.find((t) => t.name === name);
+			await thread?.setArchived();
+		}
+	}
+
+	private generateWordGameThreadName(
+		game: (typeof WORDGAMES)[number],
+		date: dayjs.Dayjs,
+	) {
+		const gameNumber = this.calculateWordGameNumber(game, date);
+		const name = `${game.game} ${gameNumber} - ${date.format('DD MMMM YYYY')}`;
+		this.server.log.debug(`Created thread name for ${game.game}: ${name}`);
+		return name;
+	}
+
+	private calculateWordGameNumber(
+		game: (typeof WORDGAMES)[number],
+		date: dayjs.Dayjs,
+	) {
+		const gameNumber = Math.floor(
+			dayjs.duration(date.diff(game.startDate)).asDays(),
+		);
+		return gameNumber;
 	}
 }

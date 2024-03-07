@@ -20,6 +20,8 @@ const config = parseEnv(process.env, {
 	DISCORD_GUILD_ID: z.string(),
 	DISCORD_OPTIONAL_CATEGORY_ID: z.string(),
 	DISCORD_PLEX_CHANNEL: z.string(),
+	DISCORD_WORD_GAMES_CHANNEL: z.string(),
+	DISCORD_WORD_GAMES_SCHEDULE: z.string(),
 });
 
 async function configPlugin(fastify: FastifyInstance) {
