@@ -41,7 +41,10 @@ export class Bot {
 				return this.createWordGameThread(game);
 			});
 			const createThreadJob = new CronJob(
-				{ cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE },
+				{
+					cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE,
+					timezone: 'America/New_York',
+				},
 				createThreadTask,
 			);
 			this.server.scheduler.addCronJob(createThreadJob);
@@ -53,7 +56,10 @@ export class Bot {
 				},
 			);
 			const archiveThreadJob = new CronJob(
-				{ cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE },
+				{
+					cronExpression: this.server.config.DISCORD_WORD_GAMES_SCHEDULE,
+					timezone: 'America/New_York',
+				},
 				archiveThreadTask,
 			);
 			this.server.scheduler.addCronJob(archiveThreadJob);
