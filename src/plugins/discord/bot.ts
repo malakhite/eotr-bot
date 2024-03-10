@@ -127,7 +127,7 @@ export class Bot {
 		);
 
 		if (channel instanceof TextChannel) {
-			const tomorrow = dayjs().startOf('day').add(1, 'day');
+			const tomorrow = dayjs.tz().startOf('day').add(1, 'day');
 			const name = this.generateWordGameThreadName(game, tomorrow);
 			channel.threads.create({
 				name,
@@ -136,7 +136,7 @@ export class Bot {
 	}
 
 	private async archiveWordGameThread(game: (typeof WORDGAMES)[number]) {
-		const today = dayjs().startOf('day');
+		const today = dayjs.tz().startOf('day');
 		const name = this.generateWordGameThreadName(game, today);
 		const channel = this.server.discord.channels.cache.get(
 			this.server.config.DISCORD_WORD_GAMES_CHANNEL,
