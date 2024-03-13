@@ -5,7 +5,7 @@ export const SONGWHIP_URL = 'https://songwhip.com/';
 export const WORDGAMES = [
 	{
 		game: 'Wordle',
-		startDate: dayjs('2021-06-16').startOf('day'),
+		startDate: dayjs('2021-06-20').startOf('day'),
 	},
 	{
 		game: 'Connections',
