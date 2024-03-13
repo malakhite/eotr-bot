@@ -22,6 +22,7 @@ const config = parseEnv(process.env, {
 	DISCORD_PLEX_CHANNEL: z.string(),
 	DISCORD_WORD_GAMES_CHANNEL: z.string(),
 	DISCORD_WORD_GAMES_SCHEDULE: z.string(),
+	LOCAL_TIMEZONE: z.string(),
 });
 
 async function configPlugin(fastify: FastifyInstance) {
