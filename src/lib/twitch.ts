@@ -5,6 +5,7 @@ import type { FastifyInstance } from 'fastify';
 
 export function createLiveHandler(fastify: FastifyInstance) {
 	return async function postChannelLive(event: EventSubStreamOnlineEvent) {
+		fastify.log.debug(event);
 		const { discord } = fastify;
 		const updatesChannel = discord.channels.cache.get(
 			fastify.config.DISCORD_UPDATES_CHANNEL,
@@ -27,7 +28,7 @@ export function createLiveHandler(fastify: FastifyInstance) {
 		const broadcaster = await event.getBroadcaster();
 		const stream = await event.getStream();
 
-		const channelUrl = new URL(broadcaster.displayName, 'https://twitch.tv');
+		const channelUrl = new URL(broadcaster.name, 'https://twitch.tv');
 		const thumbnail = broadcaster.profilePictureUrl;
 
 		const goingLiveEmbed = new EmbedBuilder()

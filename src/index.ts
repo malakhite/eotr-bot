@@ -33,7 +33,6 @@ import { createLiveHandler } from './lib/twitch';
 	const twitchMiddleware = new EventSubMiddleware({
 		apiClient,
 		hostName: 'eb.scottabbey.com',
-		pathPrefix: '/webhooks/twitch',
 		secret: server.config.TWITCH_LOCAL_SECRET,
 	});
 	twitchMiddleware.apply(server.express);
