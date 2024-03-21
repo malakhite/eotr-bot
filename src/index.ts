@@ -23,19 +23,22 @@ import { createLiveHandler } from './lib/twitch';
 	await server.register(discordPlugin);
 	await server.register(multer.contentParser);
 
-	const authProvider = new AppTokenAuthProvider(
-		server.config.TWITCH_CLIENT_ID,
-		server.config.TWITCH_CLIENT_SECRET,
-	);
+	let twitchMiddleware: EventSubMiddleware | undefined;
+	if (server.config.ENABLE_TWITCH) {
+		const authProvider = new AppTokenAuthProvider(
+			server.config.TWITCH_CLIENT_ID,
+			server.config.TWITCH_CLIENT_SECRET,
+		);
 
-	const apiClient = new ApiClient({ authProvider });
+		const apiClient = new ApiClient({ authProvider });
 
-	const twitchMiddleware = new EventSubMiddleware({
-		apiClient,
-		hostName: 'eb.scottabbey.com',
-		secret: server.config.TWITCH_LOCAL_SECRET,
-	});
-	twitchMiddleware.apply(server.express);
+		twitchMiddleware = new EventSubMiddleware({
+			apiClient,
+			hostName: 'eb.scottabbey.com',
+			secret: server.config.TWITCH_LOCAL_SECRET,
+		});
+		twitchMiddleware.apply(server.express);
+	}
 
 	server.listen(
 		{
@@ -48,11 +51,13 @@ import { createLiveHandler } from './lib/twitch';
 				process.exit(1);
 			}
 
-			await twitchMiddleware.markAsReady();
-			const liveHandler = createLiveHandler(server);
-			server.config.TWITCH_USER_IDS.forEach((userId) => {
-				twitchMiddleware.onStreamOnline(userId, liveHandler);
-			});
+			if (server.config.ENABLE_TWITCH && twitchMiddleware) {
+				await twitchMiddleware.markAsReady();
+				const liveHandler = createLiveHandler(server);
+				server.config.TWITCH_USER_IDS.forEach((userId) => {
+					twitchMiddleware?.onStreamOnline(userId, liveHandler);
+				});
+			}
 		},
 	);
 })();

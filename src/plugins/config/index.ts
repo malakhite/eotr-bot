@@ -27,6 +27,7 @@ const env = parseEnv(process.env, {
 	TWITCH_CLIENT_ID: z.string(),
 	TWITCH_CLIENT_SECRET: z.string(),
 	TWITCH_LOCAL_SECRET: z.string(),
+	ENABLE_TWITCH: z.coerce.boolean().default(false),
 });
 
 const config = {
