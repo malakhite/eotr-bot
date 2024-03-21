@@ -1,14 +1,15 @@
 import * as Fastify from 'fastify';
 import multer from 'fastify-multer';
 import fe from '@fastify/express';
-import config from './plugins/config';
-import discordPlugin from './plugins/discord';
-import handleUpdate from './routes/plex-update';
 import { fastifySchedule } from '@fastify/schedule';
 import { ApiClient } from '@twurple/api';
 import { AppTokenAuthProvider } from '@twurple/auth';
 import { EventSubMiddleware } from '@twurple/eventsub-http';
-import { createLiveHandler } from 'lib/twitch';
+
+import config from './plugins/config';
+import discordPlugin from './plugins/discord';
+import handleUpdate from './routes/plex-update';
+import { createLiveHandler } from './lib/twitch';
 
 (async function main() {
 	const server = Fastify.fastify({
