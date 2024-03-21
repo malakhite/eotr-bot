@@ -71,7 +71,6 @@ export class Bot {
 			this.server.config.DISCORD_TOKEN,
 		);
 		const commandFiles = readdirSync(join(__dirname, 'commands'));
-		this.server.log.info(`Adding ${commandFiles.length} commands.`);
 		for (const file of commandFiles) {
 			const command = (await import(join(__dirname, 'commands', file))) as {
 				default: Command;
@@ -91,7 +90,6 @@ export class Bot {
 		)) as unknown[];
 
 		this.server.log.debug(result);
-		this.server.log.info(`Added ${result.length} commands successfully.`);
 	}
 
 	private async onInteractionCreate() {

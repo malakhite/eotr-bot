@@ -50,6 +50,7 @@ async function handleMusic(url: URL, server: FastifyInstance) {
 				data: {
 					item: {
 						name: track,
+						image,
 						url: songwhipUrl,
 						links: linkResults,
 						artists: [{ name: artist }],
@@ -76,6 +77,7 @@ async function handleMusic(url: URL, server: FastifyInstance) {
 
 		const sources = new EmbedBuilder()
 			.setTitle(`${track} by ${artist}`)
+			.setThumbnail(image)
 			.setURL(`https://songwhip.com${songwhipUrl}`)
 			.addFields(...links);
 
@@ -93,7 +95,7 @@ const music: Command = {
 				.setDescription('The URL of a music streaming source.')
 				.setRequired(true);
 		}),
-	execute: async function execute(server, interaction) {
+	async execute(server, interaction) {
 		const url = interaction.options.getString('url');
 		if (!url) {
 			throw new Error('No URL entered.');
