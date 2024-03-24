@@ -12,3 +12,6 @@ export const WORDGAMES = [
 		startDate: dayjs('2023-06-12').startOf('day'),
 	},
 ];
+
+export const APP_START_EVENT = 'app-started';
+export const TWITCH_USER_IDS = ['72535319'];

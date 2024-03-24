@@ -1,5 +1,6 @@
 {
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow.json": "file:///home/scott/source/eotr-bot/.github/workflows/action.yml"
-  }
+	"yaml.schemas": {
+		"https://json.schemastore.org/github-workflow.json": "file:///home/scott/source/eotr-bot/.github/workflows/action.yml"
+	},
+	"typescript.preferences.importModuleSpecifier": "relative"
 }
