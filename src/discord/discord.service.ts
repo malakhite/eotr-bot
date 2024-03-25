@@ -1,11 +1,19 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
-import { APIEmbedField, EmbedBuilder } from 'discord.js';
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron } from '@nestjs/schedule';
+import { APIEmbedField, Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { Context, Options, SlashCommand, SlashCommandContext } from 'necord';
 import { catchError, firstValueFrom } from 'rxjs';
 
 import { MusicDto } from './music.dto';
 import { RollDto } from './roll.dto';
+
+import dayjs from '../lib/date-time';
 
 import type { MusicProvider, SongwhipResponse } from './music.interface';
 import type { AxiosError } from 'axios';
@@ -27,8 +35,29 @@ export class DiscordService {
 		youtube: 'YouTube',
 		youtubeMusic: 'YouTube Music',
 	};
+	private readonly wordgames = [
+		{
+			game: 'Wordle',
+			startDate: dayjs('2021-06-20').startOf('day'),
+			url: 'https://www.nytimes.com/games/wordle',
+		},
+		{
+			game: 'Connections',
+			startDate: dayjs('2023-06-12').startOf('day'),
+			url: 'https://www.nytimes.com/games/connections',
+		},
+		{
+			game: 'Strands',
+			startDate: dayjs('2024-03-03').startOf('day'),
+			url: 'https://www.nytimes.com/games/strands',
+		},
+	];
 
-	constructor(private readonly httpService: HttpService) {}
+	constructor(
+		private readonly discordClient: Client,
+		private readonly httpService: HttpService,
+		private readonly configService: ConfigService,
+	) {}
 
 	@SlashCommand({
 		name: 'music',
@@ -129,6 +158,41 @@ export class DiscordService {
 			);
 
 		return interaction.reply({ embeds: [embed] });
+	}
+
+	@Cron('59 23 * * *', {
+		timeZone: 'America/New_York',
+	})
+	private async handleWordGameThreads() {
+		const today = dayjs().tz(this.configService.get('LOCAL_TIMEZONE'));
+		const tomorrow = today.add(1, 'day');
+		const channel = this.discordClient.channels.cache.get(
+			this.configService.get('DISCORD_WORD_GAMES_CHANNEL'),
+		);
+		if (!(channel instanceof TextChannel)) {
+			throw new InternalServerErrorException(
+				`${this.configService.get('DISCORD_WORD_GAMES_CHANNEL')} is not a text channel.`,
+			);
+		}
+
+		this.wordgames.forEach(async (game) => {
+			const gameNumber = Math.floor(
+				dayjs.duration(tomorrow.diff(game.startDate)).asDays(),
+			);
+			const threadName = `${game.game} ${gameNumber} - ${tomorrow.format('DD MMM YYYY')}`;
+			await channel.threads.create({
+				name: threadName,
+				startMessage: game.url,
+			});
+		});
+
+		channel.threads.cache
+			.filter((thread) => {
+				return thread.name.includes(today.format('DD MMM YYYY'));
+			})
+			.forEach((thread) => {
+				thread.setArchived();
+			});
 	}
 
 	private rollDice(count: number, sides: number) {

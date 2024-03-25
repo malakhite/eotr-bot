@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { validate } from './env.validation';
 
@@ -13,8 +14,9 @@ import { TwitchModule } from '../twitch/twitch.module';
 			isGlobal: true,
 			validate,
 		}),
-		EventEmitterModule.forRoot(),
 		DiscordModule,
+		EventEmitterModule.forRoot(),
+		ScheduleModule.forRoot(),
 		TwitchModule,
 	],
 	controllers: [],
