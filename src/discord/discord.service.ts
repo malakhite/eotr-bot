@@ -6,7 +6,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import { APIEmbedField, Client, EmbedBuilder, TextChannel } from 'discord.js';
+import {
+	APIEmbedField,
+	Client,
+	EmbedBuilder,
+	TextChannel,
+	ThreadAutoArchiveDuration,
+} from 'discord.js';
 import { Context, Options, SlashCommand, SlashCommandContext } from 'necord';
 import { catchError, firstValueFrom } from 'rxjs';
 
@@ -182,7 +188,8 @@ export class DiscordService {
 			const threadName = `${game.game} ${gameNumber} - ${tomorrow.format('DD MMM YYYY')}`;
 			await channel.threads.create({
 				name: threadName,
-				startMessage: game.url,
+				autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+				reason: game.url,
 			});
 		});
 
