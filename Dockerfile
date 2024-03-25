@@ -16,4 +16,4 @@ ENV NODE_ENV production
 RUN pnpm install --frozen-lockfile && npm install -g nest
 COPY --from=builder [ "/var/app/dist", "./dist" ]
 
-ENTRYPOINT pnpm start
+ENTRYPOINT node dist/main.js
