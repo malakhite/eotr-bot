@@ -2,9 +2,9 @@ FROM node:lts-alpine AS builder
 WORKDIR /var/app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY [ "package.json", "pnpm-lock.yaml", "./" ]
-RUN [ "pnpm", "install", "--frozen-lockfile" ]
+RUN pnpm install --frozen-lockfile && npm install -g nest
 COPY [ "./", "./" ]
-RUN [ "pnpm", "build" ]
+RUN pnpm build
 
 FROM node:lts-alpine
 WORKDIR /var/app
@@ -16,4 +16,4 @@ ENV NODE_ENV production
 RUN pnpm install --frozen-lockfile && npm install -g nest
 COPY --from=builder [ "/var/app/dist", "./dist" ]
 
-ENTRYPOINT [ "pnpm", "start" ]
+ENTRYPOINT pnpm start
