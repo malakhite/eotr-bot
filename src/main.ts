@@ -10,7 +10,21 @@ import { APP_START_EVENT } from './constants';
 import type { NextFunction, Request, Response } from 'express';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule, { bodyParser: false });
+	const logger = ['fatal', 'error', 'warn', 'log'];
+	if (
+		process.env.LOG_LEVEL === 'debug' ||
+		process.env.LOG_LEVEL === 'verbose'
+	) {
+		logger.push('debug');
+	}
+	if (process.env.LOG_LEVEL === 'verbose') {
+		logger.push('verbose');
+	}
+
+	const app = await NestFactory.create(AppModule, {
+		bodyParser: false,
+		logger,
+	});
 
 	const configService = app.get(ConfigService);
 	const eventSubPath = configService.get('TWITCH_EVENTSUB_PATH');
