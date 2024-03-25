@@ -13,7 +13,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY [ "package.json", "pnpm-lock.yaml", "./" ]
 
 ENV NODE_ENV production
-RUN [ "pnpm", "install", "--frozen-lockfile" ]
+RUN pnpm install --frozen-lockfile && npm install -g nest
 COPY --from=builder [ "/var/app/dist", "./dist" ]
 
 ENTRYPOINT [ "pnpm", "start" ]
