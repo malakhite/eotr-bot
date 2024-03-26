@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -10,7 +10,7 @@ import { APP_START_EVENT } from './constants';
 import type { NextFunction, Request, Response } from 'express';
 
 async function bootstrap() {
-	const logger = ['fatal', 'error', 'warn', 'log'];
+	const logger: LogLevel[] = ['fatal', 'error', 'warn', 'log'];
 	if (
 		process.env.LOG_LEVEL === 'debug' ||
 		process.env.LOG_LEVEL === 'verbose'
