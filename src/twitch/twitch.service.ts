@@ -9,7 +9,7 @@ import {
 import { EventSubMiddleware } from '@twurple/eventsub-http';
 import { Client, EmbedBuilder } from 'discord.js';
 
-import { APP_START_EVENT, TWITCH_USER_IDS } from 'src/constants';
+import { APP_START_EVENT, TWITCH_USER_IDS } from '../constants';
 
 @Injectable()
 export class TwitchService {
