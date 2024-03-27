@@ -30,42 +30,46 @@ export class TwitchService {
 	}
 
 	private async postChannelLive(event: EventSubStreamOnlineEvent) {
-		this.logger.debug({ message: 'Received Twitch event', event });
+		try {
+			this.logger.debug({ message: 'Received Twitch event', event });
 
-		const updatesChannel = this.discordClient.channels.cache.get(
-			this.configService.get('DISCORD_UPDATES_CHANNEL'),
-		);
-		if (!updatesChannel) {
-			this.logger.error({
-				message: 'Unable to open DISCORD_UPDATES_CHANNEL',
-				channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
-			});
-			return;
+			const updatesChannel = this.discordClient.channels.cache.get(
+				this.configService.get('DISCORD_UPDATES_CHANNEL'),
+			);
+			if (!updatesChannel) {
+				this.logger.error({
+					message: 'Unable to open DISCORD_UPDATES_CHANNEL',
+					channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
+				});
+				return;
+			}
+			if (!updatesChannel.isTextBased()) {
+				this.logger.error({
+					message: 'DISORD_UPDATES_CHANNEL is not a text channel.',
+					channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
+				});
+				return;
+			}
+
+			const broadcaster = await event.getBroadcaster();
+			const stream = await event.getStream();
+
+			const channelUrl = new URL(broadcaster.name, 'https://twitch.tv');
+			const thumbnail = broadcaster.profilePictureUrl;
+
+			const goingLiveEmbed = new EmbedBuilder()
+				.setTitle(`${event.broadcasterDisplayName} is streaming now!`)
+				.setURL(channelUrl.toString())
+				.setThumbnail(thumbnail);
+
+			if (stream?.gameName) {
+				goingLiveEmbed.addFields({ name: 'Playing', value: stream.gameName });
+			}
+
+			await updatesChannel.send({ embeds: [goingLiveEmbed] });
+		} catch (e) {
+			this.logger.error(e);
 		}
-		if (!updatesChannel.isTextBased()) {
-			this.logger.error({
-				message: 'DISORD_UPDATES_CHANNEL is not a text channel.',
-				channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
-			});
-			return;
-		}
-
-		const broadcaster = await event.getBroadcaster();
-		const stream = await event.getStream();
-
-		const channelUrl = new URL(broadcaster.name, 'https://twitch.tv');
-		const thumbnail = broadcaster.profilePictureUrl;
-
-		const goingLiveEmbed = new EmbedBuilder()
-			.setTitle(`${event.broadcasterDisplayName} is streaming now!`)
-			.setURL(channelUrl.toString())
-			.setThumbnail(thumbnail);
-
-		if (stream?.gameName) {
-			goingLiveEmbed.addFields({ name: 'Playing', value: stream.gameName });
-		}
-
-		await updatesChannel.send({ embeds: [goingLiveEmbed] });
 	}
 
 	async start() {
