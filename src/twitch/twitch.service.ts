@@ -25,7 +25,7 @@ export class TwitchService {
 
 	@OnEvent(APP_START_EVENT)
 	private async _onAppStart() {
-		this.logger.log({ message: 'Starting Twitch listener.' });
+		this.logger.log({ msg: 'Starting Twitch listener.' });
 		await this.start();
 	}
 

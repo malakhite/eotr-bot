@@ -32,6 +32,7 @@ async function bootstrap() {
 	app.useLogger(app.get(Logger));
 
 	const eventSubPath = configService.get('TWITCH_EVENTSUB_PATH');
+	const port = configService.get('PORT');
 
 	app.use((req: Request, res: Response, next: NextFunction) => {
 		if (req.path.includes(eventSubPath)) {
@@ -42,7 +43,7 @@ async function bootstrap() {
 	});
 	app.useGlobalPipes(new ValidationPipe());
 
-	await app.listen(3000);
+	await app.listen(port);
 
 	const eventEmitter = app.get(EventEmitter2);
 	eventEmitter.emit(APP_START_EVENT);
