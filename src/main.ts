@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { json } from 'body-parser';
+import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app/app.module';
 import { APP_START_EVENT } from './constants';
@@ -23,10 +24,13 @@ async function bootstrap() {
 
 	const app = await NestFactory.create(AppModule, {
 		bodyParser: false,
+		bufferLogs: true,
 		logger,
 	});
 
 	const configService = app.get(ConfigService);
+	app.useLogger(app.get(Logger));
+
 	const eventSubPath = configService.get('TWITCH_EVENTSUB_PATH');
 
 	app.use((req: Request, res: Response, next: NextFunction) => {

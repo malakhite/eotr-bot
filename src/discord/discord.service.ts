@@ -54,7 +54,7 @@ export class DiscordService {
 		},
 		{
 			game: 'Strands',
-			startDate: dayjs('2024-03-03').startOf('day'),
+			startDate: dayjs('2024-03-04').startOf('day'),
 			url: 'https://www.nytimes.com/games/strands',
 		},
 	];
