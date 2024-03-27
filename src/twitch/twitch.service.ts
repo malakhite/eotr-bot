@@ -29,25 +29,29 @@ export class TwitchService {
 		await this.start();
 	}
 
-	private createChannelLiveHandler(logger: Logger) {
+	private createChannelLiveHandler(
+		configService: ConfigService,
+		logger: Logger,
+		discordClient: Client,
+	) {
 		return async function channelLiveHandler(event: EventSubStreamOnlineEvent) {
 			try {
 				logger.debug({ message: 'Received Twitch event', event });
 
-				const updatesChannel = this.discordClient.channels.cache.get(
-					this.configService.get('DISCORD_UPDATES_CHANNEL'),
+				const updatesChannel = discordClient.channels.cache.get(
+					configService.get('DISCORD_UPDATES_CHANNEL'),
 				);
 				if (!updatesChannel) {
 					logger.error({
 						message: 'Unable to open DISCORD_UPDATES_CHANNEL',
-						channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
+						channel: configService.get('DISCORD_UPDATES_CHANNEL'),
 					});
 					return;
 				}
 				if (!updatesChannel.isTextBased()) {
 					logger.error({
 						message: 'DISORD_UPDATES_CHANNEL is not a text channel.',
-						channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
+						channel: configService.get('DISCORD_UPDATES_CHANNEL'),
 					});
 					return;
 				}
@@ -82,7 +86,11 @@ export class TwitchService {
 		for await (const userId of TWITCH_USER_IDS) {
 			const eventSubscription = this.eventSubListener.onStreamOnline(
 				userId,
-				this.createChannelLiveHandler(this.logger),
+				this.createChannelLiveHandler(
+					this.configService,
+					this.logger,
+					this.discordClient,
+				),
 			);
 			const testUrl = await eventSubscription.getCliTestCommand();
 			this.logger.log({
