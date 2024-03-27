@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { json } from 'body-parser';
-import { Logger } from 'nestjs-pino';
+import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { AppModule } from './app/app.module';
 import { APP_START_EVENT } from './constants';
@@ -42,6 +42,7 @@ async function bootstrap() {
 		}
 	});
 	app.useGlobalPipes(new ValidationPipe());
+	app.useGlobalInterceptors(new LoggerErrorInterceptor());
 
 	await app.listen(port);
 
