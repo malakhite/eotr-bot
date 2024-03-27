@@ -78,6 +78,11 @@ export class TwitchService {
 				userId,
 				this.postChannelLive,
 			);
+			const testUrl = await eventSubscription.getCliTestCommand();
+			this.logger.log({
+				msg: `Added event subscription for ${userId}.`,
+				testUrl,
+			});
 			subscriptions.set(eventSubscription.id, eventSubscription);
 		}
 	}
