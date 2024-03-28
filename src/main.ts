@@ -1,12 +1,10 @@
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { json } from 'body-parser';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { AppModule } from './app/app.module';
-import { APP_START_EVENT } from './constants';
 
 import type { NextFunction, Request, Response } from 'express';
 
@@ -45,9 +43,6 @@ async function bootstrap() {
 	app.useGlobalInterceptors(new LoggerErrorInterceptor());
 
 	await app.listen(port);
-
-	const eventEmitter = app.get(EventEmitter2);
-	eventEmitter.emit(APP_START_EVENT);
 }
 
 bootstrap();
