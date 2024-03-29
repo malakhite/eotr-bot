@@ -7,6 +7,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { validate } from './env.validation';
 
 import { DiscordModule } from '../discord/discord.module';
+import { FilesModule } from '../files/files.module';
 import { PlexModule } from '../plex/plex.module';
 import { TwitchModule } from '../twitch/twitch.module';
 
@@ -17,6 +18,7 @@ import { TwitchModule } from '../twitch/twitch.module';
 			validate,
 		}),
 		LoggerModule.forRoot(),
+		FilesModule,
 		DiscordModule,
 		EventEmitterModule.forRoot(),
 		PlexModule,
