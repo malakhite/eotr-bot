@@ -9,29 +9,6 @@ import {
 	ValidateNested,
 } from 'class-validator';
 
-export class PlexUpdateDto {
-	@IsString()
-	event: string;
-
-	@IsBoolean()
-	user: boolean;
-
-	@IsBoolean()
-	owner: boolean;
-
-	@ValidateNested()
-	Account: AccountDto;
-
-	@ValidateNested()
-	Server: ServerDto;
-
-	@ValidateNested()
-	Player: PlayerDto;
-
-	@ValidateNested()
-	Metadata: MetadataDto;
-}
-
 class AccountDto {
 	@IsNumber()
 	id: number;
@@ -132,4 +109,27 @@ class MetadataDto {
 
 	@IsNumber()
 	updatedAt: number;
+}
+
+export class PlexUpdateDto {
+	@IsString()
+	event: string;
+
+	@IsBoolean()
+	user: boolean;
+
+	@IsBoolean()
+	owner: boolean;
+
+	@ValidateNested()
+	Account: AccountDto;
+
+	@ValidateNested()
+	Server: ServerDto;
+
+	@ValidateNested()
+	Player: PlayerDto;
+
+	@ValidateNested()
+	Metadata: MetadataDto;
 }
