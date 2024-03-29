@@ -4,7 +4,7 @@ export function validate(config: Record<string, unknown>) {
 	return z
 		.object({
 			PORT: z.number().default(8080),
-			HOST: z.string().default('0.0.0.0'),
+			HOST: z.string().default('localhost'),
 			DISCORD_TOKEN: z.string(),
 			DISCORD_APP_ID: z.string(),
 			DISCORD_GUILD_ID: z.string(),

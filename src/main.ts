@@ -1,6 +1,7 @@
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { json } from 'body-parser';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
@@ -20,11 +21,12 @@ async function bootstrap() {
 		logger.push('verbose');
 	}
 
-	const app = await NestFactory.create(AppModule, {
+	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
 		bodyParser: false,
 		bufferLogs: true,
 		logger,
 	});
+	app.disable('x-powered-by');
 
 	const configService = app.get(ConfigService);
 	app.useLogger(app.get(Logger));

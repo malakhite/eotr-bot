@@ -112,24 +112,31 @@ class MetadataDto {
 }
 
 export class PlexUpdateDto {
+	@IsOptional()
 	@IsString()
-	event: string;
+	event?: string;
 
+	@IsOptional()
 	@IsBoolean()
-	user: boolean;
+	user?: boolean;
 
+	@IsOptional()
 	@IsBoolean()
-	owner: boolean;
+	owner?: boolean;
 
+	@IsOptional()
 	@ValidateNested()
-	Account: AccountDto;
+	Account?: AccountDto;
 
+	@IsOptional()
 	@ValidateNested()
-	Server: ServerDto;
+	Server?: ServerDto;
 
+	@IsOptional()
 	@ValidateNested()
-	Player: PlayerDto;
+	Player?: PlayerDto;
 
+	@IsOptional()
 	@ValidateNested()
-	Metadata: MetadataDto;
+	Metadata?: MetadataDto;
 }
