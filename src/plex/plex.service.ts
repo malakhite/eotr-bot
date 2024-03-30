@@ -2,6 +2,7 @@ import {
 	Injectable,
 	InternalServerErrorException,
 	Logger,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client, EmbedBuilder } from 'discord.js';
@@ -22,9 +23,14 @@ export class PlexService {
 
 	async handleLibraryNew(
 		plexUpdateDto: PlexUpdateDto,
+		secret: string,
 		thumb?: Express.Multer.File,
 	) {
 		this.logger.debug(plexUpdateDto);
+
+		if (!this.secretIsValid(secret)) {
+			throw new UnauthorizedException();
+		}
 
 		const channel = this.discordClient.channels.cache.get(
 			this.configService.get('DISCORD_PLEX_CHANNEL'),
@@ -69,5 +75,10 @@ export class PlexService {
 		});
 
 		return 'Ok';
+	}
+
+	private secretIsValid(maybeSecret: string) {
+		const secret = this.configService.get('PLEX_WEBHOOK_SECRET');
+		return secret === maybeSecret;
 	}
 }

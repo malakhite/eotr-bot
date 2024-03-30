@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Query } from '@nestjs/common';
 
 import { PlexUpdateDto } from './plex-update.dto';
 import { PlexService } from './plex.service';
@@ -9,11 +9,17 @@ export class PlexController {
 
 	@Post('webhook')
 	async updates(
+		@Query('secret')
+		secret: string,
+
 		@Body()
 		plexUpdateDto: PlexUpdateDto,
 	) {
 		if (plexUpdateDto.event === 'library.new') {
-			const result = await this.plexService.handleLibraryNew(plexUpdateDto);
+			const result = await this.plexService.handleLibraryNew(
+				plexUpdateDto,
+				secret,
+			);
 
 			return result;
 		}

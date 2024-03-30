@@ -14,6 +14,7 @@ export function validate(config: Record<string, unknown>) {
 			DISCORD_WORD_GAMES_CHANNEL: z.string(),
 			DISCORD_WORD_GAMES_SCHEDULE: z.string(),
 			LOCAL_TIMEZONE: z.string(),
+			PLEX_WEBHOOK_SECRET: z.string(),
 			TWITCH_CLIENT_ID: z.string(),
 			TWITCH_CLIENT_SECRET: z.string(),
 			TWITCH_EVENTSUB_SECRET: z.string(),
