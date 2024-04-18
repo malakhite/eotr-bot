@@ -20,6 +20,7 @@ export function validate(config: Record<string, unknown>) {
 			TWITCH_EVENTSUB_SECRET: z.string(),
 			TWITCH_EVENTSUB_PATH: z.string(),
 			ENABLE_TWITCH: z.coerce.boolean().default(false),
+			LOG_LEVEL: z.string().default('info'),
 		})
 		.parse(config);
 }

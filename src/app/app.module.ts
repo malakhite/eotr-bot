@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from 'nestjs-pino';
@@ -17,7 +17,15 @@ import { TwitchModule } from '../twitch/twitch.module';
 			isGlobal: true,
 			validate,
 		}),
-		LoggerModule.forRoot(),
+		LoggerModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: async (config: ConfigService) => {
+				return {
+					pinoHttp: { level: config.get('LOG_LEVEL') },
+				};
+			},
+		}),
 		FilesModule,
 		DiscordModule,
 		EventEmitterModule.forRoot(),
