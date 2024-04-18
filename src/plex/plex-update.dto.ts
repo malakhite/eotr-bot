@@ -143,5 +143,5 @@ export class PlexUpdateDto {
 
 export class PlexPayloadDto {
 	@IsOptional()
-	payload?: PlexUpdateDto;
+	payload?: string;
 }

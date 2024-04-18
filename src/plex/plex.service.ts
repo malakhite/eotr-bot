@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Client, EmbedBuilder } from 'discord.js';
 
-import { PlexPayloadDto } from './plex-update.dto';
+import { PlexPayloadDto, PlexUpdateDto } from './plex-update.dto';
 
 import { FilesService } from '../files/files.service';
 
@@ -22,11 +22,11 @@ export class PlexService {
 	) {}
 
 	async handleLibraryNew(
-		plexUpdateDto: PlexPayloadDto,
+		plexPayloadDto: PlexPayloadDto,
 		secret: string,
 		thumb?: Express.Multer.File,
 	) {
-		this.logger.debug(plexUpdateDto);
+		this.logger.debug(plexPayloadDto);
 
 		if (!this.secretIsValid(secret)) {
 			throw new UnauthorizedException();
@@ -41,7 +41,7 @@ export class PlexService {
 			throw new InternalServerErrorException();
 		}
 
-		const { payload } = plexUpdateDto;
+		const payload = JSON.parse(plexPayloadDto.payload) as PlexUpdateDto;
 
 		const embed = new EmbedBuilder().setTitle(
 			`New ${payload.Metadata.librarySectionType} added`,
