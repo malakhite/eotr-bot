@@ -58,6 +58,7 @@ export class DiscordService {
 			url: 'https://www.nytimes.com/games/strands',
 		},
 	];
+	private readonly wordgame_titles = this.wordgames.map((game) => game.game);
 
 	constructor(
 		private readonly discordClient: Client,
@@ -181,25 +182,27 @@ export class DiscordService {
 			);
 		}
 
-		this.wordgames.forEach(async (game) => {
+		channel.threads.cache
+			.filter((thread) => {
+				const [game] = thread.name.split(' ');
+				return this.wordgame_titles.includes(game);
+			})
+			.forEach(async (thread) => {
+				await thread.setArchived();
+			});
+
+		for await (const game of this.wordgames) {
 			const gameNumber = Math.floor(
 				dayjs.duration(tomorrow.diff(game.startDate)).asDays(),
 			);
-			const threadName = `${game.game} ${gameNumber} - ${tomorrow.format('DD MMM YYYY')}`;
-			await channel.threads.create({
+			const threadName = `${game.game} ${gameNumber.toLocaleString()} - ${tomorrow.format('DD MMM YYYY')}`;
+			const thread = await channel.threads.create({
 				name: threadName,
 				autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
 				reason: game.url,
 			});
-		});
-
-		channel.threads.cache
-			.filter((thread) => {
-				return thread.name.includes(today.format('DD MMM YYYY'));
-			})
-			.forEach((thread) => {
-				thread.setArchived();
-			});
+			await thread.send(game.url);
+		}
 	}
 
 	private rollDice(count: number, sides: number) {

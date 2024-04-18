@@ -74,6 +74,8 @@ export class PlexService {
 			value: plexUpdateDto.Metadata.title,
 		});
 
+		await channel.send({ embeds: [embed] });
+
 		return 'Ok';
 	}
 
