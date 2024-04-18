@@ -30,6 +30,8 @@ export class PlexController {
 		@Body()
 		plexUpdateDto: PlexUpdateDto,
 	) {
+		this.logger.debug({ msg: 'recieved payload', payload: plexUpdateDto });
+
 		if (plexUpdateDto.event === 'library.new') {
 			const result = await this.plexService.handleLibraryNew(
 				plexUpdateDto,
