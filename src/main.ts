@@ -10,16 +10,13 @@ import { AppModule } from './app/app.module';
 import type { NextFunction, Request, Response } from 'express';
 
 async function bootstrap() {
-	const logger: LogLevel[] = ['fatal', 'error', 'warn', 'log'];
-	if (
-		process.env.LOG_LEVEL === 'debug' ||
-		process.env.LOG_LEVEL === 'verbose'
-	) {
-		logger.push('debug');
-	}
-	if (process.env.LOG_LEVEL === 'verbose') {
-		logger.push('verbose');
-	}
+	console.log(process.env.LOG_LEVEL);
+	const logger: LogLevel[] =
+		process.env.LOG_LEVEL.toLowerCase() === 'debug' ||
+		process.env.LOG_LEVEL.toLowerCase() === 'verbose'
+			? ['fatal', 'error', 'warn', 'log', 'verbose', 'debug']
+			: ['fatal', 'error', 'warn', 'log'];
+	console.log(logger);
 
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
 		bodyParser: false,
