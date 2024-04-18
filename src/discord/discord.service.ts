@@ -154,7 +154,7 @@ export class DiscordService {
 	) {
 		const { dice, total } = this.rollDice(count, sides);
 
-		this.logger.debug({ message: 'Dice roll', dice, total });
+		this.logger.debug({ msg: 'Dice roll', dice, total });
 
 		const embed = new EmbedBuilder()
 			.setTitle('Roll result')

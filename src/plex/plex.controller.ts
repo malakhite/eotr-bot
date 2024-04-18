@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { PlexUpdateDto } from './plex-update.dto';
+import { PlexPayloadDto } from './plex-update.dto';
 import { PlexService } from './plex.service';
 
 @Controller('plex')
@@ -28,13 +28,13 @@ export class PlexController {
 		secret: string,
 
 		@Body()
-		plexUpdateDto: PlexUpdateDto,
+		plexPayloadDto: PlexPayloadDto,
 	) {
-		this.logger.debug({ msg: 'recieved payload', payload: plexUpdateDto });
+		this.logger.debug({ msg: 'recieved payload', payload: plexPayloadDto });
 
-		if (plexUpdateDto.event === 'library.new') {
+		if (plexPayloadDto.payload.event === 'library.new') {
 			const result = await this.plexService.handleLibraryNew(
-				plexUpdateDto,
+				plexPayloadDto,
 				secret,
 			);
 

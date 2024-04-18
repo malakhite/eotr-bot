@@ -28,21 +28,21 @@ export class TwitchService implements OnModuleInit {
 			const eventSubscription = this.eventSubListener.onStreamOnline(
 				userId,
 				async (event) => {
-					this.logger.debug({ message: 'Received Twitch event', event });
+					this.logger.debug({ msg: 'Received Twitch event', event });
 
 					const updatesChannel = this.discordClient.channels.cache.get(
 						this.configService.get('DISCORD_UPDATES_CHANNEL'),
 					);
 					if (!updatesChannel) {
 						this.logger.error({
-							message: 'Unable to open DISCORD_UPDATES_CHANNEL',
+							msg: 'Unable to open DISCORD_UPDATES_CHANNEL',
 							channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
 						});
 						return;
 					}
 					if (!updatesChannel.isTextBased()) {
 						this.logger.error({
-							message: 'DISORD_UPDATES_CHANNEL is not a text channel.',
+							msg: 'DISORD_UPDATES_CHANNEL is not a text channel.',
 							channel: this.configService.get('DISCORD_UPDATES_CHANNEL'),
 						});
 						return;

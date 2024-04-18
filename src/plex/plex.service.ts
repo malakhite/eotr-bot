@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Client, EmbedBuilder } from 'discord.js';
 
-import { PlexUpdateDto } from './plex-update.dto';
+import { PlexPayloadDto } from './plex-update.dto';
 
 import { FilesService } from '../files/files.service';
 
@@ -22,7 +22,7 @@ export class PlexService {
 	) {}
 
 	async handleLibraryNew(
-		plexUpdateDto: PlexUpdateDto,
+		plexUpdateDto: PlexPayloadDto,
 		secret: string,
 		thumb?: Express.Multer.File,
 	) {
@@ -41,8 +41,10 @@ export class PlexService {
 			throw new InternalServerErrorException();
 		}
 
+		const { payload } = plexUpdateDto;
+
 		const embed = new EmbedBuilder().setTitle(
-			`New ${plexUpdateDto.Metadata.librarySectionType} added`,
+			`New ${payload.Metadata.librarySectionType} added`,
 		);
 
 		if (thumb) {
@@ -54,24 +56,24 @@ export class PlexService {
 			embed.setThumbnail(url.toString());
 		}
 
-		if (plexUpdateDto.Metadata.librarySectionType !== 'movie') {
-			if (plexUpdateDto.Metadata.grandparentTitle) {
+		if (payload.Metadata.librarySectionType !== 'movie') {
+			if (payload.Metadata.grandparentTitle) {
 				embed.addFields({
 					name: 'Grandparent',
-					value: plexUpdateDto.Metadata.grandparentTitle,
+					value: payload.Metadata.grandparentTitle,
 				});
 			}
-			if (plexUpdateDto.Metadata.parentTitle) {
+			if (payload.Metadata.parentTitle) {
 				embed.addFields({
 					name: 'Parent',
-					value: plexUpdateDto.Metadata.parentTitle,
+					value: payload.Metadata.parentTitle,
 				});
 			}
 		}
 
 		embed.addFields({
 			name: 'Title',
-			value: plexUpdateDto.Metadata.title,
+			value: payload.Metadata.title,
 		});
 
 		await channel.send({ embeds: [embed] });

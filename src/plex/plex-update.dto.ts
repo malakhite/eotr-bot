@@ -140,3 +140,8 @@ export class PlexUpdateDto {
 	@ValidateNested()
 	Metadata?: MetadataDto;
 }
+
+export class PlexPayloadDto {
+	@IsOptional()
+	payload?: PlexUpdateDto;
+}
