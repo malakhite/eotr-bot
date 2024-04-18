@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Client, EmbedBuilder } from 'discord.js';
 
-import { PlexPayloadDto, PlexUpdateDto } from './plex-update.dto';
+import { PlexUpdateDto } from './plex-update.dto';
 
 import { FilesService } from '../files/files.service';
 
@@ -22,11 +22,11 @@ export class PlexService {
 	) {}
 
 	async handleLibraryNew(
-		plexPayloadDto: PlexPayloadDto,
+		payload: PlexUpdateDto,
 		secret: string,
 		thumb?: Express.Multer.File,
 	) {
-		this.logger.debug(plexPayloadDto);
+		this.logger.debug(payload);
 
 		if (!this.secretIsValid(secret)) {
 			throw new UnauthorizedException();
@@ -40,8 +40,6 @@ export class PlexService {
 			this.logger.error('DISCORD_PLEX_CHANNEL is not a text channel.');
 			throw new InternalServerErrorException();
 		}
-
-		const payload = JSON.parse(plexPayloadDto.payload) as PlexUpdateDto;
 
 		const embed = new EmbedBuilder().setTitle(
 			`New ${payload.Metadata.librarySectionType} added`,

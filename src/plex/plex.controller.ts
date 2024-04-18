@@ -32,11 +32,10 @@ export class PlexController {
 	) {
 		this.logger.debug({ msg: 'recieved payload', payload: plexPayloadDto });
 
-		if (plexPayloadDto.payload.event === 'library.new') {
-			const result = await this.plexService.handleLibraryNew(
-				plexPayloadDto,
-				secret,
-			);
+		const payload = JSON.parse(plexPayloadDto.payload);
+
+		if (payload.event === 'library.new') {
+			const result = await this.plexService.handleLibraryNew(payload, secret);
 
 			return result;
 		}
