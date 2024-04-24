@@ -11,6 +11,18 @@ import { PlexUpdateDto } from './plex-update.dto';
 
 import { FilesService } from '../files/files.service';
 
+const librarySectionTypeMap = {
+	show: 'episode',
+};
+
+const grandparentMap = {
+	show: 'Series',
+};
+
+const parentMap = {
+	show: 'Season',
+};
+
 @Injectable()
 export class PlexService {
 	private readonly logger = new Logger(PlexService.name);
@@ -42,7 +54,7 @@ export class PlexService {
 		}
 
 		const embed = new EmbedBuilder().setTitle(
-			`New ${payload.Metadata.librarySectionType} added`,
+			`New ${librarySectionTypeMap[payload.Metadata.librarySectionType] || payload.Metadata.librarySectionType} added`,
 		);
 
 		if (thumb) {
@@ -57,13 +69,15 @@ export class PlexService {
 		if (payload.Metadata.librarySectionType !== 'movie') {
 			if (payload.Metadata.grandparentTitle) {
 				embed.addFields({
-					name: 'Grandparent',
+					name:
+						grandparentMap[payload.Metadata.librarySectionType] ||
+						'Grandparent',
 					value: payload.Metadata.grandparentTitle,
 				});
 			}
 			if (payload.Metadata.parentTitle) {
 				embed.addFields({
-					name: 'Parent',
+					name: parentMap[payload.Metadata.librarySectionType] || 'Parent',
 					value: payload.Metadata.parentTitle,
 				});
 			}

@@ -1,4 +1,5 @@
 import {
+	IsArray,
 	IsBoolean,
 	IsIP,
 	IsNumber,
@@ -41,6 +42,11 @@ class PlayerDto {
 
 	@IsUUID()
 	uuid: string;
+}
+
+class Guid {
+	@IsString()
+	id: string;
 }
 
 class MetadataDto {
@@ -109,6 +115,10 @@ class MetadataDto {
 
 	@IsNumber()
 	updatedAt: number;
+
+	@IsOptional()
+	@IsArray()
+	Guid: Guid[];
 }
 
 export class PlexUpdateDto {
@@ -143,5 +153,6 @@ export class PlexUpdateDto {
 
 export class PlexPayloadDto {
 	@IsOptional()
+	@ValidateNested()
 	payload?: string;
 }
