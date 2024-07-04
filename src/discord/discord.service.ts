@@ -7,18 +7,32 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import {
+	ActionRowBuilder,
 	APIEmbedField,
 	Client,
 	EmbedBuilder,
+	GuildMemberRoleManager,
+	Role,
+	RoleSelectMenuBuilder,
 	TextChannel,
 	ThreadAutoArchiveDuration,
 } from 'discord.js';
-import { Context, Options, SlashCommand, SlashCommandContext } from 'necord';
+import {
+	Context,
+	ISelectedRoles,
+	Options,
+	RoleSelect,
+	RoleSelectContext,
+	SelectedRoles,
+	SlashCommand,
+	SlashCommandContext,
+} from 'necord';
 import { catchError, firstValueFrom } from 'rxjs';
 
 import { MusicDto } from './music.dto';
 import { RollDto } from './roll.dto';
 
+import { SELF_ASSIGNABLE_ROLES } from '../constants';
 import dayjs from '../lib/date-time';
 
 import type { MusicProvider, SongwhipResponse } from './music.interface';
@@ -165,6 +179,50 @@ export class DiscordService {
 			);
 
 		return interaction.reply({ embeds: [embed] });
+	}
+
+	@SlashCommand({
+		name: 'roles',
+		description: 'Add and remove yourself from notification roles.',
+	})
+	public roles(
+		@Context()
+		[interaction]: SlashCommandContext,
+	) {
+		const roleSelect = new RoleSelectMenuBuilder()
+			.setCustomId('SELF_ASSIGN_ROLES')
+			.setPlaceholder('Select roles')
+			.addDefaultRoles(SELF_ASSIGNABLE_ROLES);
+
+		const row = new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+			roleSelect,
+		);
+
+		return interaction.reply({ components: [row] });
+	}
+
+	@RoleSelect('SELF_ASSIGN_ROLES')
+	public async onRoleSelect(
+		@Context()
+		[interaction]: RoleSelectContext,
+
+		@SelectedRoles()
+		roles: ISelectedRoles,
+	) {
+		const selectedRoles = roles.filter((role) => role instanceof Role);
+		const roleManger = interaction.member.roles;
+
+		if (roleManger instanceof GuildMemberRoleManager) {
+			SELF_ASSIGNABLE_ROLES.forEach((role) => {
+				if (selectedRoles.has(role)) {
+					roleManger.add(role);
+				} else {
+					roleManger.remove(role);
+				}
+			});
+		}
+
+		return interaction.reply('Successfully updated roles.');
 	}
 
 	@Cron('59 23 * * *', {
