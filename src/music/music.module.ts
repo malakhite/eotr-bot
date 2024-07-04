@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+// import { Module } from '@nestjs/common';
 
-import { SonglinkService } from './songlink.service';
+// import { SonglinkService } from './songlink.service';
 
-@Module({
-    providers: [
-        SonglinkService
-    ]
-})
-export class MusicModule {}
+// @Module({
+//     providers: [
+//         SonglinkService
+//     ]
+// })
+// export class MusicModule {}
