@@ -193,14 +193,14 @@ export class DiscordService {
 			.setCustomId('SELF_ASSIGN_ROLES')
 			.setPlaceholder('Select roles')
 			.setMinValues(0)
-			.setMaxValues(4)
-			.addDefaultRoles(SELF_ASSIGNABLE_ROLES);
+			.setMaxValues(25)
+			.addDefaultRoles();
 
 		const row = new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
 			roleSelect,
 		);
 
-		return interaction.reply({ components: [row] });
+		return interaction.reply({ components: [row], ephemeral: true });
 	}
 
 	@RoleSelect('SELF_ASSIGN_ROLES')
