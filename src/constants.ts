@@ -22,3 +22,5 @@ export const SELF_ASSIGNABLE_ROLES = [
 	'1251694219026890752',
 	'1258200737381486603',
 ];
+
+export const TVDB_API = 'https://api4.thetvdb.com/v4';

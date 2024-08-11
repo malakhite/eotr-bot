@@ -1,3 +1,4 @@
+import { HttpService } from '@nestjs/axios';
 import {
 	Injectable,
 	InternalServerErrorException,
@@ -6,10 +7,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client, EmbedBuilder } from 'discord.js';
+import { firstValueFrom, map, mergeMap } from 'rxjs';
 
 import { PlexUpdateDto } from './plex-update.dto';
 
-import { FilesService } from '../files/files.service';
+import { TVDB_API } from '../constants';
 
 const librarySectionTypeMap = {
 	show: 'episode',
@@ -30,14 +32,10 @@ export class PlexService {
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly discordClient: Client,
-		private readonly fileService: FilesService,
+		private readonly httpService: HttpService,
 	) {}
 
-	async handleLibraryNew(
-		payload: PlexUpdateDto,
-		secret: string,
-		thumb?: Express.Multer.File,
-	) {
+	async handleLibraryNew(payload: PlexUpdateDto, secret: string) {
 		this.logger.debug(payload);
 
 		if (!this.secretIsValid(secret)) {
@@ -57,13 +55,20 @@ export class PlexService {
 			`New ${librarySectionTypeMap[payload.Metadata.librarySectionType] || payload.Metadata.librarySectionType} added`,
 		);
 
-		if (thumb) {
-			const url = await this.fileService.retrieveFileUrl(
-				this.configService.get('HOST'),
-				thumb.buffer,
-			);
+		if (
+			payload.Metadata.librarySectionType === 'movie' ||
+			payload.Metadata.librarySectionType === 'show'
+		) {
+			const query =
+				payload.Metadata.grandparentTitle ||
+				payload.Metadata.parentTitle ||
+				payload.Metadata.title;
 
-			embed.setThumbnail(url.toString());
+			const type =
+				payload.Metadata.librarySectionType === 'movie' ? 'movie' : 'series';
+
+			const image = await this.fetchCoverUrl(query, type);
+			embed.setThumbnail(image);
 		}
 
 		if (payload.Metadata.librarySectionType !== 'movie') {
@@ -93,8 +98,93 @@ export class PlexService {
 		return 'Ok';
 	}
 
+	private async fetchCoverUrl(title: string, mediaType: 'movie' | 'series') {
+		return firstValueFrom(
+			this.httpService
+				.get<{ status: string; data: { token: string } }>(`${TVDB_API}/login`, {
+					data: { apiKey: this.configService.get('TVDB_API_TOKEN') },
+				})
+				.pipe(
+					mergeMap((result) => {
+						return this.httpService.get<TVDBSearchResponse>(
+							`${TVDB_API}/search`,
+							{
+								params: {
+									query: title,
+									type: mediaType,
+								},
+								headers: {
+									Authorization: `Bearer ${result.data.data.token}`,
+									Accept: 'application/json',
+								},
+							},
+						);
+					}),
+					map((result) => {
+						if (result.data.data.length > 0) {
+							const imageUrls = result.data.data
+								.map((item) => item.image_url)
+								.filter((item) => !!item);
+							if (imageUrls.length > 0) {
+								return imageUrls[0];
+							}
+						}
+						return '';
+					}),
+				),
+		);
+	}
+
 	private secretIsValid(maybeSecret: string) {
 		const secret = this.configService.get('PLEX_WEBHOOK_SECRET');
 		return secret === maybeSecret;
 	}
 }
+
+type TVDBSearchResponse = {
+	status: string;
+	data: {
+		aliases: string[];
+		companies: string[];
+		companyType: string;
+		country: string;
+		director: string;
+		first_air_time: string;
+		genres: string[];
+		id: string;
+		image_url: string;
+		is_official: boolean;
+		name_translated: string;
+		network: string;
+		objectID: string;
+		officialList: string;
+		overview: string;
+		overviews: Record<string, string>;
+		overview_translated: string[];
+		poster: string;
+		posters: string[];
+		primary_language: string;
+		remote_ids: {
+			id: string;
+			type: number;
+			sourceName: string;
+		}[];
+		status: string;
+		slug: string;
+		studios: string[];
+		title: string;
+		thumbnail: string;
+		translations: Record<string, string>;
+		translationsWithLang: string[];
+		tvdb_id: string;
+		type: string;
+		year: string;
+	}[];
+	links: {
+		prev: string;
+		next: string;
+		self: string;
+		total_items: number;
+		page_size: number;
+	};
+};
