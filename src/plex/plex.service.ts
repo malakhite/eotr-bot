@@ -67,8 +67,12 @@ export class PlexService {
 			const type =
 				payload.Metadata.librarySectionType === 'movie' ? 'movie' : 'series';
 
-			const image = await this.fetchCoverUrl(query, type);
-			embed.setThumbnail(image);
+			try {
+				const image = await this.fetchCoverUrl(query, type);
+				embed.setThumbnail(image);
+			} catch (e) {
+				this.logger.error(e);
+			}
 		}
 
 		if (payload.Metadata.librarySectionType !== 'movie') {
