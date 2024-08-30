@@ -80,6 +80,7 @@ export class DiscordService {
 
 		try {
 			const songServiceResponse = await this.songlinkService.getSongByUrl(url);
+			this.logger.debug(songServiceResponse);
 
 			const links: APIEmbedField[] = songServiceResponse.services.map(
 				(service) => {
