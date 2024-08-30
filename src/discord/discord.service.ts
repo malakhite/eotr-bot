@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import {
 	ActionRowBuilder,
-	// APIEmbedField,
 	Client,
 	EmbedBuilder,
 	GuildMemberRoleManager,
@@ -86,20 +85,12 @@ export class DiscordService {
 				.map((service) => `- [**${service.service}**](${service.url})`)
 				.join('\n');
 
-			// const links: APIEmbedField[] = songServiceResponse.services.map(
-			// 	(service) => {
-			// 		return {
-			// 			name: service.service,
-			// 			value: service.url,
-			// 		};
-			// 	},
-			// );
-
 			const embeds = [
 				new EmbedBuilder()
 					.setTitle(
 						`${songServiceResponse.title} by ${songServiceResponse.artist}`,
 					)
+					.setURL(url)
 					.setThumbnail(songServiceResponse.cover)
 					.setDescription(description),
 			];

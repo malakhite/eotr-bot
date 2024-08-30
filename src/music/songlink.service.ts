@@ -47,7 +47,8 @@ export class SonglinkService implements IMusicSearchProvider {
 			.map(([key, value]) => ({
 				service: providerMap.get(key),
 				url: value.url,
-			}));
+			}))
+			.sort((a, b) => (a.service < b.service ? -1 : 1));
 
 		return { artist, title, cover, services };
 	}
