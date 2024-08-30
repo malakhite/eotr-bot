@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import {
 	ActionRowBuilder,
-	APIEmbedField,
+	// APIEmbedField,
 	Client,
 	EmbedBuilder,
 	GuildMemberRoleManager,
@@ -82,14 +82,18 @@ export class DiscordService {
 			const songServiceResponse = await this.songlinkService.getSongByUrl(url);
 			this.logger.debug(songServiceResponse);
 
-			const links: APIEmbedField[] = songServiceResponse.services.map(
-				(service) => {
-					return {
-						name: service.service,
-						value: service.url,
-					};
-				},
-			);
+			const description = songServiceResponse.services
+				.map((service) => `- [**${service.service}**](${service.url})`)
+				.join('\n');
+
+			// const links: APIEmbedField[] = songServiceResponse.services.map(
+			// 	(service) => {
+			// 		return {
+			// 			name: service.service,
+			// 			value: service.url,
+			// 		};
+			// 	},
+			// );
 
 			const embeds = [
 				new EmbedBuilder()
@@ -97,7 +101,7 @@ export class DiscordService {
 						`${songServiceResponse.title} by ${songServiceResponse.artist}`,
 					)
 					.setThumbnail(songServiceResponse.cover)
-					.addFields(...links),
+					.setDescription(description),
 			];
 
 			return interaction.editReply({ embeds });
