@@ -6,5 +6,6 @@ import { SonglinkService } from './songlink.service';
 @Module({
 	imports: [HttpModule],
 	providers: [SonglinkService],
+	exports: [SonglinkService],
 })
 export class MusicModule {}
