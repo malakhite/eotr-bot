@@ -50,7 +50,7 @@ class EntityByUniqueId {
 	type: 'song' | 'album';
 	title?: string;
 	artistName?: string;
-	thummbnailUrl?: string;
+	thumbnailUrl?: string;
 	thumbnailWidth?: number;
 	thumbnailHeight?: number;
 	apiProvider: APIProvider;

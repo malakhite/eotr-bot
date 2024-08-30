@@ -23,6 +23,8 @@ export class SonglinkService implements IMusicSearchProvider {
 				.get<SongLinkResponse>(requestUrl.toString(), {
 					params: {
 						url,
+						songIfSingle: true,
+						type: 'song',
 					},
 				})
 				.pipe(
@@ -36,7 +38,7 @@ export class SonglinkService implements IMusicSearchProvider {
 		const entities = Object.values(data.entitiesByUniqueId);
 		const preferredEntity =
 			entities.find((entity) => entity.apiProvider === 'itunes') || entities[0];
-		const cover = preferredEntity.thummbnailUrl;
+		const cover = preferredEntity.thumbnailUrl;
 		const artist = preferredEntity.artistName;
 		const title = preferredEntity.title;
 
