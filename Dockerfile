@@ -1,6 +1,6 @@
 FROM node:lts-alpine AS builder
 WORKDIR /var/app
-RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
+RUN npm install -g pnpm
 COPY [ "package.json", "pnpm-lock.yaml", "./" ]
 RUN pnpm install --frozen-lockfile && npm install -g nest
 COPY [ "./", "./" ]

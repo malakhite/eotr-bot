@@ -1,0 +1,15 @@
+export const providerMap = new Map([
+	['amazonMusic', 'Amazon Music'],
+	['amazonStore', 'Amazon Store'],
+	['appleMusic', 'Apple Music'],
+	['deezer', 'Deezer'],
+	['google', 'Google'],
+	['googleStore', 'Google Play Store'],
+	['itunes', 'iTunes'],
+	['pandora', 'Pandora'],
+	['soundcloud', 'Soundcloud'],
+	['spotify', 'Spotify'],
+	['tidal', 'Tidal'],
+	['youtube', 'YouTube'],
+	['youtubeMusic', 'YouTube Music'],
+]);

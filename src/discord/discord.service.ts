@@ -27,34 +27,18 @@ import {
 	SlashCommand,
 	SlashCommandContext,
 } from 'necord';
-import { catchError, firstValueFrom } from 'rxjs';
 
 import { MusicDto } from './music.dto';
 import { RollDto } from './roll.dto';
 
 import { SELF_ASSIGNABLE_ROLES } from '../constants';
 import dayjs from '../lib/date-time';
-
-import type { MusicProvider, SongwhipResponse } from './music.interface';
-import type { AxiosError } from 'axios';
-
-type OurProviders = Extract<
-	MusicProvider,
-	'itunes' | 'amazonMusic' | 'spotify' | 'tidal' | 'youtube' | 'youtubeMusic'
->;
+import { SonglinkService } from '../music/songlink.service';
 
 @Injectable()
 export class DiscordService {
 	private readonly logger = new Logger(DiscordService.name);
-	private readonly songwhipUrl = 'https://songwhip.com/';
-	private readonly ourServices: Record<OurProviders, string> = {
-		amazonMusic: 'Amazon Music',
-		itunes: 'Apple Music',
-		spotify: 'Spotify',
-		tidal: 'Tidal',
-		youtube: 'YouTube',
-		youtubeMusic: 'YouTube Music',
-	};
+
 	private readonly wordgames = [
 		{
 			game: 'Wordle',
@@ -78,6 +62,7 @@ export class DiscordService {
 		private readonly discordClient: Client,
 		private readonly httpService: HttpService,
 		private readonly configService: ConfigService,
+		private readonly songlinkService: SonglinkService,
 	) {}
 
 	@SlashCommand({
@@ -93,66 +78,32 @@ export class DiscordService {
 	) {
 		await interaction.deferReply();
 
-		const songwhipApi = new URL('api', this.songwhipUrl);
+		try {
+			const songServiceResponse = await this.songlinkService.getSongByUrl(url);
 
-		const { data } = await firstValueFrom(
-			this.httpService
-				.post<SongwhipResponse>(songwhipApi.toString(), {
-					url,
-					country: 'US',
-				})
-				.pipe(
-					catchError((error: AxiosError) => {
-						this.logger.error(error.response.data);
-						throw error.message;
-					}),
-				),
-		);
-
-		if (data.status !== 'success') {
-			this.logger.error(data);
-			return interaction.editReply(
-				"Sorry, I'm unable to complete this request.",
-			);
-		}
-
-		const {
-			data: {
-				item: {
-					name: track,
-					image,
-					url: songwhipUrl,
-					links: linkResults,
-					artists: [{ name: artist }],
+			const links: APIEmbedField[] = songServiceResponse.services.map(
+				(service) => {
+					return {
+						name: service.service,
+						value: service.url,
+					};
 				},
-			},
-		} = data;
+			);
 
-		const links = Object.keys(this.ourServices).reduce((acc, service) => {
-			if (linkResults[service as OurProviders]) {
-				const result = linkResults[service as OurProviders]!;
-				if (result.length && result.length > 0) {
-					acc.push(
-						...result.map((source) => ({
-							name: this.ourServices[service as OurProviders],
-							value: source.link.replaceAll('{country}', 'US'),
-						})),
-					);
-				}
-			}
+			const embeds = [
+				new EmbedBuilder()
+					.setTitle(
+						`${songServiceResponse.title} by ${songServiceResponse.artist}`,
+					)
+					.setThumbnail(songServiceResponse.cover)
+					.addFields(...links),
+			];
 
-			return acc;
-		}, [] as APIEmbedField[]);
-
-		const embeds = [
-			new EmbedBuilder()
-				.setTitle(`${track} by ${artist}`)
-				.setThumbnail(image)
-				.setURL(`https://songwhip.com${songwhipUrl}`)
-				.addFields(...links),
-		];
-
-		return interaction.editReply({ embeds });
+			return interaction.editReply({ embeds });
+		} catch (e) {
+			this.logger.error(e);
+			return interaction.editReply(`I'm sorry, but I can't find that track.`);
+		}
 	}
 
 	@SlashCommand({
