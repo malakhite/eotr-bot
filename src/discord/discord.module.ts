@@ -6,6 +6,8 @@ import { NecordModule } from 'necord';
 
 import { DiscordService } from './discord.service';
 
+import { MusicModule } from '../music/music.module';
+
 @Module({
 	imports: [
 		HttpModule,
@@ -22,6 +24,7 @@ import { DiscordService } from './discord.service';
 				};
 			},
 		}),
+		MusicModule,
 	],
 	providers: [DiscordService],
 })
