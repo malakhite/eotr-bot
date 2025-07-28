@@ -1,9 +1,9 @@
+import { InjectEventSubHttpListener } from '@nestjs-twurple/eventsub-http';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectEventSubHttpListener } from '@nestjs-twurple/eventsub-http';
 import { EventSubSubscription } from '@twurple/eventsub-base';
 import { EventSubMiddleware } from '@twurple/eventsub-http';
-import { Client, EmbedBuilder } from 'discord.js';
+import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 
 import { TWITCH_USER_IDS } from '../constants';
 
@@ -66,7 +66,7 @@ export class TwitchService implements OnModuleInit {
 						});
 					}
 
-					await updatesChannel.send({ embeds: [goingLiveEmbed] });
+					await (updatesChannel as TextChannel).send({ embeds: [goingLiveEmbed] });
 				},
 			);
 			const testUrl = await eventSubscription.getCliTestCommand();

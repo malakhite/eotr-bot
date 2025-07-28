@@ -6,7 +6,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Client, EmbedBuilder } from 'discord.js';
+import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { firstValueFrom, map, mergeMap } from 'rxjs';
 
 import { PlexUpdateDto } from './plex-update.dto';
@@ -97,7 +97,7 @@ export class PlexService {
 			value: payload.Metadata.title,
 		});
 
-		await channel.send({ embeds: [embed] });
+		await (channel as TextChannel).send({ embeds: [embed] });
 
 		return 'Ok';
 	}
