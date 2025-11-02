@@ -8,7 +8,6 @@ import { validate } from './env.validation';
 
 import { DiscordModule } from '../discord/discord.module';
 import { FilesModule } from '../files/files.module';
-// import { MusicModule } from '../music/music.module';
 import { PlexModule } from '../plex/plex.module';
 import { TwitchModule } from '../twitch/twitch.module';
 
@@ -30,7 +29,6 @@ import { TwitchModule } from '../twitch/twitch.module';
 		FilesModule,
 		DiscordModule,
 		EventEmitterModule.forRoot(),
-		// MusicModule,
 		PlexModule,
 		ScheduleModule.forRoot(),
 		TwitchModule,

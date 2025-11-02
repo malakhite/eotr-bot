@@ -1,19 +1,20 @@
-FROM node:lts-alpine AS builder
-WORKDIR /var/app
-RUN npm install -g pnpm
-COPY [ "package.json", "pnpm-lock.yaml", "./" ]
-RUN pnpm install --frozen-lockfile && npm install -g nest
-COPY [ "./", "./" ]
-RUN pnpm build
+FROM node:lts-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
+RUN corepack enable
+COPY [ "./", "/app" ]
+WORKDIR /app
 
-FROM node:lts-alpine
-WORKDIR /var/app
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN corepack enable && corepack prepare pnpm@9.4.0 --activate
-COPY [ "package.json", "pnpm-lock.yaml", "./" ]
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-ENV NODE_ENV production
-RUN pnpm install --frozen-lockfile && npm install -g nest
-COPY --from=builder [ "/var/app/dist", "./dist" ]
-
-ENTRYPOINT node dist/main.js
+FROM base
+ENV NODE_ENV=production
+COPY --from=prod-deps [ "/app/node_modules", "/app/node_modules" ]
+COPY --from=build [ "/app/dist", "/app/dist" ]
+EXPOSE 8080
+ENTRYPOINT [ "pnpm", "start:prod" ]
