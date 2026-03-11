@@ -4,7 +4,7 @@ import { AxiosError } from 'axios';
 import { catchError, firstValueFrom } from 'rxjs';
 
 import { providerMap } from './constants';
-import { IMusicSearchProvider } from './music.interface';
+import { IMusicSearchProvider, MusicResultMap } from './music.interface';
 import { SongLinkResponse } from './songlink.dto';
 
 @Injectable()
@@ -35,20 +35,34 @@ export class SonglinkService implements IMusicSearchProvider {
 				),
 		);
 
-		const entities = Object.values(data.entitiesByUniqueId);
-		const preferredEntity =
-			entities.find((entity) => entity.apiProvider === 'itunes') || entities[0];
-		const cover = preferredEntity.thumbnailUrl;
-		const artist = preferredEntity.artistName;
-		const title = preferredEntity.title;
+		const services: MusicResultMap = Object.values(
+			data.entitiesByUniqueId,
+		).reduce((acc, curr) => {
+			if (curr.type === 'song') {
+				curr.platforms.forEach((platform) => {
+					acc[platform] = {
+						artist: curr.artistName,
+						service_name: providerMap.get(platform),
+						thumbnail: curr.thumbnailUrl,
+						title: curr.title,
+						url: data.linksByPlatform[platform].url,
+					};
+				});
+			}
 
-		const services = Object.entries(data.linksByPlatform)
-			.filter(([key]) => providerMap.has(key))
-			.map(([key, value]) => ({
-				service: providerMap.get(key),
-				url: value.url,
-			}))
-			.sort((a, b) => (a.service < b.service ? -1 : 1));
+			return acc;
+		}, {} as MusicResultMap);
+
+		const preferredEntity =
+			Object.values(services).find((service) => service.url === 'url') ??
+			services.itunes ??
+			services.soundcloud ??
+			services.bandcamp ??
+			services.youtube ??
+			Object.values(services)[0];
+		const cover = preferredEntity.thumbnail;
+		const artist = preferredEntity.artist;
+		const title = preferredEntity.title;
 
 		return { artist, title, cover, services };
 	}

@@ -81,8 +81,11 @@ export class DiscordService {
 			const songServiceResponse = await this.songlinkService.getSongByUrl(url);
 			this.logger.debug(songServiceResponse);
 
-			const description = songServiceResponse.services
-				.map((service) => `- [**${service.service}**](${service.url})`)
+			const description = Object.values(songServiceResponse.services)
+				.map(
+					(service) =>
+						`- **${service.service_name}**: [${service.title} - ${service.artist}](${service.url})`,
+				)
 				.join('\n');
 
 			const embeds = [

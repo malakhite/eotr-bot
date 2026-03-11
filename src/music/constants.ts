@@ -1,15 +1,25 @@
-export const providerMap = new Map([
+import { Platform } from './songlink.dto';
+
+export const providerMap = new Map<Platform, string>([
 	['amazonMusic', 'Amazon Music'],
 	['amazonStore', 'Amazon Store'],
+	['anghami', 'Anghami'],
 	['appleMusic', 'Apple Music'],
+	['audiomack', 'Audiomack'],
+	['audius', 'Audius'],
+	['bandcamp', 'Bandcamp'],
+	['boomplay', 'Boomplay'],
 	['deezer', 'Deezer'],
 	['google', 'Google'],
 	['googleStore', 'Google Play Store'],
 	['itunes', 'iTunes'],
+	['napster', 'Napster'],
 	['pandora', 'Pandora'],
 	['soundcloud', 'Soundcloud'],
+	['spinrilla', 'Spinrilla'],
 	['spotify', 'Spotify'],
 	['tidal', 'Tidal'],
+	['yandex', 'Yandex Music'],
 	['youtube', 'YouTube'],
 	['youtubeMusic', 'YouTube Music'],
 ]);
