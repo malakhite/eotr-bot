@@ -7,4 +7,8 @@ export class MusicDto {
 		required: true,
 	})
 	url: string;
+
+	constructor(url: string) {
+		this.url = url;
+	}
 }

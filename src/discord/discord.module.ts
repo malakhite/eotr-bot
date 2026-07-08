@@ -15,7 +15,7 @@ import { MusicModule } from '../music/music.module';
 			inject: [ConfigService],
 			useFactory(configService: ConfigService) {
 				return {
-					token: configService.get('DISCORD_TOKEN'),
+					token: configService.get('DISCORD_TOKEN')!,
 					intents: [
 						GatewayIntentBits.Guilds,
 						GatewayIntentBits.GuildMessages,

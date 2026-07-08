@@ -14,4 +14,9 @@ export class RollDto {
 		required: true,
 	})
 	sides: number;
+
+	constructor(count: number, sides: number) {
+		this.count = count;
+		this.sides = sides;
+	}
 }

@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import {
 	Injectable,
 	InternalServerErrorException,
@@ -11,6 +10,8 @@ import {
 	Client,
 	EmbedBuilder,
 	GuildMemberRoleManager,
+	type InteractionResponse,
+	type Message,
 	Role,
 	RoleSelectMenuBuilder,
 	TextChannel,
@@ -59,7 +60,6 @@ export class DiscordService {
 
 	constructor(
 		private readonly discordClient: Client,
-		private readonly httpService: HttpService,
 		private readonly configService: ConfigService,
 		private readonly songlinkService: SonglinkService,
 	) {}
@@ -74,7 +74,7 @@ export class DiscordService {
 
 		@Options()
 		{ url }: MusicDto,
-	) {
+	): Promise<Message<boolean>> {
 		await interaction.deferReply();
 
 		try {
@@ -88,15 +88,17 @@ export class DiscordService {
 				)
 				.join('\n');
 
-			const embeds = [
-				new EmbedBuilder()
-					.setTitle(
-						`${songServiceResponse.title} by ${songServiceResponse.artist}`,
-					)
-					.setURL(url)
-					.setThumbnail(songServiceResponse.cover)
-					.setDescription(description),
-			];
+			const baseEmbed = new EmbedBuilder()
+				.setTitle(
+					`${songServiceResponse.title} by ${songServiceResponse.artist}`,
+				)
+				.setURL(url)
+				.setDescription(description);
+
+			if (songServiceResponse.cover) {
+				baseEmbed.setThumbnail(songServiceResponse.cover);
+			}
+			const embeds = [baseEmbed];
 
 			return interaction.editReply({ embeds });
 		} catch (e) {
@@ -115,7 +117,7 @@ export class DiscordService {
 
 		@Options()
 		{ count, sides }: RollDto,
-	) {
+	): Promise<InteractionResponse<boolean>> {
 		const { dice, total } = this.rollDice(count, sides);
 
 		this.logger.debug({ msg: 'Dice roll', dice, total });
@@ -154,6 +156,9 @@ export class DiscordService {
 	}
 
 	@RoleSelect('SELF_ASSIGN_ROLES')
+	/**
+	 * @type {import }
+	 */
 	public async onRoleSelect(
 		@Context()
 		[interaction]: RoleSelectContext,
@@ -162,7 +167,7 @@ export class DiscordService {
 		roles: ISelectedRoles,
 	) {
 		const selectedRoles = roles.filter((role) => role instanceof Role);
-		const roleManger = interaction.member.roles;
+		const roleManger = interaction.member?.roles;
 
 		if (roleManger instanceof GuildMemberRoleManager) {
 			SELF_ASSIGNABLE_ROLES.forEach((role) => {
@@ -184,7 +189,7 @@ export class DiscordService {
 		const today = dayjs().tz(this.configService.get('LOCAL_TIMEZONE'));
 		const tomorrow = today.add(1, 'day');
 		const channel = this.discordClient.channels.cache.get(
-			this.configService.get('DISCORD_WORD_GAMES_CHANNEL'),
+			this.configService.get('DISCORD_WORD_GAMES_CHANNEL')!,
 		);
 		if (!(channel instanceof TextChannel)) {
 			throw new InternalServerErrorException(
@@ -220,7 +225,7 @@ export class DiscordService {
 			Math.floor(Math.random() * sides + 1),
 		);
 		const total = dice.reduce((acc, curr) => {
-			return (acc += curr);
+			return acc + curr;
 		}, 0);
 
 		return { dice, total };

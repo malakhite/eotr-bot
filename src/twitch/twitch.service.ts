@@ -31,7 +31,7 @@ export class TwitchService implements OnModuleInit {
 					this.logger.debug({ msg: 'Received Twitch event', event });
 
 					const updatesChannel = this.discordClient.channels.cache.get(
-						this.configService.get('DISCORD_UPDATES_CHANNEL'),
+						this.configService.get('DISCORD_UPDATES_CHANNEL')!,
 					);
 					if (!updatesChannel) {
 						this.logger.error({
@@ -66,7 +66,9 @@ export class TwitchService implements OnModuleInit {
 						});
 					}
 
-					await (updatesChannel as TextChannel).send({ embeds: [goingLiveEmbed] });
+					await (updatesChannel as TextChannel).send({
+						embeds: [goingLiveEmbed],
+					});
 				},
 			);
 			const testUrl = await eventSubscription.getCliTestCommand();
